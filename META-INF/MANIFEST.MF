@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Plugin
+Bundle-SymbolicName: rascal-repl.plugin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: net.lappie.repl.plugin.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ rascal;bundle-version="0.6.2",
+ org.eclipse.imp.pdb.values;bundle-version="0.4.1",
+ rascal_eclipse;bundle-version="0.6.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.core.resources

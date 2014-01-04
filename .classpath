@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.imp.pdb.values"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/rascal"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/rascal-eclipse"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

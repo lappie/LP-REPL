@@ -170,6 +170,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				setCommand(selection);
 			}
 			forceEvaluate();
+			setCursorToEnd();
 		}
 	}
 
