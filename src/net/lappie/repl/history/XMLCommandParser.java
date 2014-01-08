@@ -3,6 +3,7 @@ package net.lappie.repl.history;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -143,6 +144,7 @@ public class XMLCommandParser {
 			}
 			
 			NodeList runList = doc.getElementsByTagName("output");
+			ArrayList<String> commands = new ArrayList<>();
 			
 			for (int i = 0; i < runList.getLength(); i++) {
 				Node outputNode = runList.item(i);
@@ -151,12 +153,13 @@ public class XMLCommandParser {
 					String type = nnm.getNamedItem("type").getTextContent();
 					String output = outputNode.getTextContent();
 					if(type.equals(CommandType.COMMAND.toString()))
-						repl.executeCommand(output);
+						commands.add(output);
 					
-					if(type.equals(CommandType.MESSAGE.toString()))
-						repl.displayMessage(output);
+					//if(type.equals(CommandType.MESSAGE.toString())) //TODO, display messages. 
+						//repl.displayMessage(output);
 				}
 			}
+			repl.executeCommands(commands);
 		}
 		catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block

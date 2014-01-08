@@ -236,12 +236,12 @@ public abstract class AbstractREPLPanel extends JPanel {
 	
 	public void setCommand(String command) {
 		removeCommand();
-		command = command.replaceAll("\n", "\n" + OUT_SYMBOL);
+		//command = command.replaceAll("\n", "\n" + OUT_SYMBOL);
 		add(command, styles.getRegular());
 	}
 
 	protected void addCommand(String command) {
-		command = command.replaceAll("\n", "\n" + OUT_SYMBOL);
+		command = command.replaceAll("\n", "\n" + OUT_SYMBOL); //TODO ugly, fix this
 		add(command, styles.getRegular());
 	}
 

@@ -78,11 +78,6 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		addCommandMarker();
 	}
 	
-	public void executeCommand(String command) {
-		addCommand(command);
-		forceEvaluate();
-	}
-	
 	@Override
 	public String getName() {
 		return evaluator.getName();
@@ -106,6 +101,76 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		forceEvaluate(command);
 	}
 	
+	private void doBeforeExecution(String command) {
+		history.add(new Command(command, CommandType.COMMAND));
+		commandHistory.add(command);
+		historyIndex = commandHistory.size();
+	}
+	
+	private void doAfterExecution(String command) {
+		addCommandMarker();
+	}
+	
+	
+	public void forceEvaluate(final String command) { //Warning: if changing this function, then also pay attention to ExecuteTasks
+		addNewLine();
+		doBeforeExecution(command);
+		
+		documentFilter.disableCompletely();
+		ExecuteTask et = new ExecuteTask(command);
+		et.execute();
+	}
+	
+	public void executeCommand(String command) {
+		addCommand(command);
+		forceEvaluate();
+	}
+	
+	
+	public void executeCommands(ArrayList<String> commands) {
+		documentFilter.disableCompletely();
+		
+		ExecuteTasks et = new ExecuteTasks(commands);
+		et.execute();
+	}
+	
+	private class ExecuteCommand extends AbstractAction {
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			evaluate();
+		}
+	}
+	
+	private class ExecuteTasks extends SwingWorker<Void, Void> {
+
+		private ArrayList<String> commands;
+		
+		public ExecuteTasks(ArrayList<String> commands) {
+			this.commands = commands;
+		}
+		
+		@Override
+		protected Void doInBackground() throws Exception {
+			for(String command : commands) {
+				doBeforeExecution(command);
+				
+				addCommand(command);
+				addNewLine();
+				evaluator.execute(command);
+				
+				doAfterExecution(command);
+			}
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			
+			documentFilter.enableCompletely();
+			setCursorToEnd();
+		}
+	}
+	
 	private class ExecuteTask extends SwingWorker<Void, Void> {
 
 		private String command;
@@ -117,32 +182,14 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		@Override
 		protected Void doInBackground() throws Exception {
 			evaluator.execute(command);
+			doAfterExecution(command);
 			return null;
 		}
 		
 		@Override
 		protected void done() {
-			addCommandMarker();
 			documentFilter.enableCompletely();
 			setCursorToEnd();
-		}
-	}
-	
-	public void forceEvaluate(final String command) {
-		addNewLine();
-		history.add(new Command(command, CommandType.COMMAND));
-		commandHistory.add(command);
-		historyIndex = commandHistory.size();
-		
-		documentFilter.disableCompletely();
-		ExecuteTask et = new ExecuteTask(command);
-		et.execute();
-	}
-	
-	private class ExecuteCommand extends AbstractAction {
-		@Override
-		public void actionPerformed(ActionEvent ev) {
-			evaluate();
 		}
 	}
 	

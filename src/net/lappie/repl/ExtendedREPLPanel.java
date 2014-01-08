@@ -193,7 +193,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private class EscapeCommand extends AbstractAction {
 		@Override
 		public void actionPerformed(ActionEvent ev) {
-			historyIndex = history.size();
+			historyIndex = history.size(); //reset counter
 			setCommand("");
 			setMode(COMMAND_SYMBOL);
 
