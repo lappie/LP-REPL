@@ -16,8 +16,13 @@ public class RascalFunctionHelpProvider implements IFunctionHelpProvider{
 		//Tutor tutor = new Tutor(); //For now a bit too much to start our own server, just for this. Also: How do we stop this. 
 		
 		//until we have a better way to fill it, we'll do it manually:
+		//just a test version. 
 		functionMap.put("visit", "#/Rascal/Expressions/Visit/Visit.html");
-		
+		functionMap.put("return", "/Rascal/Statements/Return/Return.html");
+		functionMap.put("while", "/Rascal/Statements/While/While.html");
+		functionMap.put("do", "/Rascal/Statements/Do/Do.html");
+		functionMap.put("for", "/Rascal/Statements/For/For.html");
+		functionMap.put("insert", "/Rascal/Statements/Insert/Insert.html");
 	}
 	
 	private void openBrowser(URI uri) {
