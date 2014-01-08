@@ -8,36 +8,45 @@ import net.lappie.repl.AbstractREPLPanel;
 
 public class REPLDocumentFilter extends DocumentFilter
 {
-	private boolean enabled = true;
+	private boolean enabledREPLFilter = true;
+	private boolean completelyDisabled = false;
 	
 	private AbstractREPLPanel panel;
 	
-	public REPLDocumentFilter(AbstractREPLPanel replPanel)
-	{
+	public REPLDocumentFilter(AbstractREPLPanel replPanel) {
 		this.panel = replPanel;
 	}
-
-	public void enable()
-	{
-		enabled = true;
+	
+	public void enableREPLFiltering() {
+		enabledREPLFilter = true;
 	}
 	
-	public void disable()
-	{
-		enabled = false;
+	/**
+	 * This ables just the REPL specific filtering part. Allows other (normal) changes still to be made.
+	 */
+	public void disableREPLFiltering() {
+		enabledREPLFilter = false;
 	}
-
+	
+	public void disableCompletely() {
+		completelyDisabled = true;
+	}	
+	
+	public void enableCompletely() {
+		completelyDisabled = false;
+	}
+	
 	@Override
-	public void remove(FilterBypass fb, int offset, int length) throws BadLocationException
-	{
-		if(enabled) {
+	public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+		if(completelyDisabled) //allow no changes
+			return; 
+		if (enabledREPLFilter) {
 			int uneditableOffset = panel.getUneditableOffset();
 			
-			if(offset < uneditableOffset)
-			{
+			if (offset < uneditableOffset) {
 				length = length - (uneditableOffset - offset);
-				if(length <= 0) //nothing to remove anymore; 
-					return;
+				if (length <= 0) // nothing to remove anymore;
+				return;
 				offset = uneditableOffset;
 			}
 		}
@@ -45,28 +54,24 @@ public class REPLDocumentFilter extends DocumentFilter
 	}
 	
 	@Override
-	public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException 
-	{
-		if(!enabled)
-		{
-			super.replace(fb, offset, length, text, attrs); //no filtering
+	public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+		if(completelyDisabled) //allow no changes
+			return;
+		if (!enabledREPLFilter) {
+			super.replace(fb, offset, length, text, attrs); // no filtering
 			return;
 		}
 		int uneditableOffset = panel.getUneditableOffset();
 		
-		text = text.replaceAll("\n", "\n   "); //TODO, find better solution here
+		text = text.replaceAll("\n", "\n   "); // TODO, find better solution here
 		
-		if (offset < uneditableOffset)
-		{
-			if(length + offset > uneditableOffset) //small usability tweak: if you select text at the command line AND history, it will be added at the beginning
-			{
+		if (offset < uneditableOffset) {
+			if (length + offset > uneditableOffset) {// small usability tweak: if you select text at the command line AND history, it will be added at the beginning
 				length = Math.max((offset + length) - uneditableOffset, 0);
 				offset = uneditableOffset;
-				panel.setCursor(offset+length);
-			}
-			else //otherwise just at the end of the command line
-			{
-				offset = panel.getTotalLength(); 
+				panel.setCursor(offset + length);
+			} else {// otherwise just at the end of the command line
+				offset = panel.getTotalLength();
 				panel.setCursor(offset);
 				length = 0;
 			}

@@ -7,15 +7,13 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JFrame;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import net.lappie.repl.functionallity.REPLDocumentFilter;
 import net.lappie.repl.history.Command;
 import net.lappie.repl.history.CommandType;
 import net.lappie.repl.languages.IREPLSettings;
-import net.lappie.repl.languages.PythonSettings;
 import net.lappie.repl.languages.evaluator.IEvaluator;
 
 /**
@@ -108,13 +106,37 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		forceEvaluate(command);
 	}
 	
-	public void forceEvaluate(String command) {
+	private class ExecuteTask extends SwingWorker<Void, Void> {
+
+		private String command;
+		
+		public ExecuteTask(String command) {
+			this.command = command;
+		}
+		
+		@Override
+		protected Void doInBackground() throws Exception {
+			evaluator.execute(command);
+			return null;
+		}
+		
+		@Override
+		protected void done() {
+			addCommandMarker();
+			documentFilter.enableCompletely();
+			setCursorToEnd();
+		}
+	}
+	
+	public void forceEvaluate(final String command) {
 		addNewLine();
 		history.add(new Command(command, CommandType.COMMAND));
 		commandHistory.add(command);
 		historyIndex = commandHistory.size();
-		evaluator.execute(command);
-		addCommandMarker();
+		
+		documentFilter.disableCompletely();
+		ExecuteTask et = new ExecuteTask(command);
+		et.execute();
 	}
 	
 	private class ExecuteCommand extends AbstractAction {
@@ -124,7 +146,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		}
 	}
 	
-	public static void main(String args[]) {
+	/*public static void main(String args[]) {
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -138,5 +160,5 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				frame.setLocationRelativeTo(null);
 			}
 		});
-	}
+	}*/
 }

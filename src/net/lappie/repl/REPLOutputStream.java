@@ -37,6 +37,8 @@ public class REPLOutputStream extends OutputStream {
 	}
 	
 	public void write(String output) {
+		if(panel == null)
+			return;
 		panel.getHistory().add(new Command(output, CommandType.OUTPUT));
 		panel.addOutput(output);
 	}
