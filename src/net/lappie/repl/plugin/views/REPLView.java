@@ -7,8 +7,6 @@ import net.lappie.repl.ExtendedREPLPanel;
 import net.lappie.repl.languages.IREPLSettings;
 import net.lappie.repl.languages.RascalSettings;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
@@ -31,7 +29,7 @@ public class REPLView extends ViewPart{
 	// and we want to keep the ability of multiple views, we'll do it like this. 
 	private static ArrayList<ExtendedREPLPanel> repls = new ArrayList<>();
 	
-	public static ExtendedREPLPanel getREPL() {
+	public static ExtendedREPLPanel getREPL() { //for making searc happen
 		if(repls.isEmpty())
 			return null;
 		return repls.get(0);
@@ -43,9 +41,10 @@ public class REPLView extends ViewPart{
 		this.mySwing = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
 		mySwingFrame = SWT_AWT.new_Frame(this.mySwing);
 
-		IProject project = null;
-		if(getViewSite().getSecondaryId() != null)
-			project = ResourcesPlugin.getWorkspace().getRoot().getProject(getViewSite().getSecondaryId());
+		//We will use this later on to load the correct project in the REPL
+//		IProject project = null;
+//		if(getViewSite().getSecondaryId() != null)
+//			project = ResourcesPlugin.getWorkspace().getRoot().getProject(getViewSite().getSecondaryId());
 		
 		IREPLSettings settings = new RascalSettings();
 		replPanel = new ExtendedREPLPanel(settings);
@@ -55,14 +54,6 @@ public class REPLView extends ViewPart{
 		setPartName(replPanel.getName());
 		mySwingFrame.add(replPanel);
 		
-		/*org.eclipse.swt.graphics.Cursor waitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
-		
-		if(Display.getDefault() != null && Display.getDefault().getActiveShell() != null)
-			Display.getDefault().getActiveShell().setCursor(waitCursor);
-		*/
-		//Cursor waitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
-		//parent.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-		//Display.getDefault().getActiveShell().setCursor(waitCursor);
 
 		//This will make sure we are in the right context so that Commands (keys) only work for us
 		IContextService contextService = (IContextService)getSite().getService(IContextService.class);

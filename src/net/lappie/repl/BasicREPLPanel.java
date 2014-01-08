@@ -109,6 +109,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	private void doAfterExecution(String command) {
 		addCommandMarker();
+		setCursorToEnd();
 	}
 	
 	
@@ -165,9 +166,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		
 		@Override
 		protected void done() {
-			
 			documentFilter.enableCompletely();
-			setCursorToEnd();
 		}
 	}
 	
