@@ -1,6 +1,7 @@
 package net.lappie.repl.plugin.views;
 
 import java.awt.Frame;
+import java.util.ArrayList;
 
 import net.lappie.repl.ExtendedREPLPanel;
 import net.lappie.repl.languages.IREPLSettings;
@@ -25,6 +26,17 @@ public class REPLView extends ViewPart{
 		super();
 	}
 	
+	//For making Search happen:
+	// this is truly the most horrible thing you have ever seen, however, since we don't have a factory yet
+	// and we want to keep the ability of multiple views, we'll do it like this. 
+	private static ArrayList<ExtendedREPLPanel> repls = new ArrayList<>();
+	
+	public static ExtendedREPLPanel getREPL() {
+		if(repls.isEmpty())
+			return null;
+		return repls.get(0);
+	}
+	
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -37,6 +49,7 @@ public class REPLView extends ViewPart{
 		
 		IREPLSettings settings = new RascalSettings();
 		replPanel = new ExtendedREPLPanel(settings);
+		repls.add(replPanel);
 		
 		
 		setPartName(replPanel.getName());

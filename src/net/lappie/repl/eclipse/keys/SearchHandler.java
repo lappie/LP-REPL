@@ -1,22 +1,20 @@
 package net.lappie.repl.eclipse.keys;
 
-import java.util.Collection;
+import net.lappie.repl.plugin.views.REPLView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 public class SearchHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("Search is called"); //TODO
-		//HandlerUtil.
-		Collection<String> contexts = HandlerUtil.getActiveContexts(event);
-		for(String context : contexts) {
-			System.out.println("context: " + context);
-		}
+		
+		//Use this class later for nice tools: HandlerUtil
+		
+		REPLView.getREPL().startSearch();
+		
 		return null;
 	}
 	

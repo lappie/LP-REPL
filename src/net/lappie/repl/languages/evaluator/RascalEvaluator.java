@@ -85,20 +85,20 @@ public class RascalEvaluator implements IEvaluator {
 			if(v != null && type != null)
 				out.write(value.toString(LINE_LIMIT));
 		} catch (ParseError pe) {
-			System.err.println("Parse error on command: " + statement);
-			System.err.println(pe.getMessage());
+//			System.err.println("Parse error on command: " + statement);
+//			System.err.println(pe.getMessage());
 			err.write(parseErrorMessage(statement, "prompt", pe));
 		} catch (StaticError e) {
-			System.err.println("Static error on command: " + statement);
-			System.err.println(e.getMessage());
+//			System.err.println("Static error on command: " + statement);
+//			System.err.println(e.getMessage());
 			err.write(staticErrorMessage(e));
 		} catch (Throw e) {
-			System.err.println("Throw on command: " + statement);
-			System.err.println(e.getMessage());
+//			System.err.println("Throw on command: " + statement);
+//			System.err.println(e.getMessage());
 			err.write(throwMessage(e));
 		} catch (Throwable e) {
-			System.err.println("Throwable on command: " + statement);
-			System.err.println(e.getMessage());
+//			System.err.println("Throwable on command: " + statement);
+//			System.err.println(e.getMessage());
 			err.write(throwableMessage(e, evaluator.getStackTrace()));
 		}
 	}

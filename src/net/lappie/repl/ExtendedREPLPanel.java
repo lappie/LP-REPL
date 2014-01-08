@@ -64,6 +64,14 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 
 		add(statusBar, BorderLayout.SOUTH);
 	}
+	
+	/**
+	 * ONLY for proof of concept that we can use search in an Eclipse view. 
+	 * This method will be removed. 
+	 */
+	public void startSearch() {
+		documentListener.loadExtension(new SearchExtension(this));
+	}
 
 	public void addHighlight(int offs, int len) {
 		try {
