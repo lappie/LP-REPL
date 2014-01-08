@@ -6,13 +6,13 @@ import javax.swing.text.DocumentFilter;
 
 import net.lappie.repl.AbstractREPLPanel;
 
-public class DocumentREPLFilter extends DocumentFilter
+public class REPLDocumentFilter extends DocumentFilter
 {
 	private boolean enabled = true;
 	
 	private AbstractREPLPanel panel;
 	
-	public DocumentREPLFilter(AbstractREPLPanel replPanel)
+	public REPLDocumentFilter(AbstractREPLPanel replPanel)
 	{
 		this.panel = replPanel;
 	}
@@ -53,6 +53,8 @@ public class DocumentREPLFilter extends DocumentFilter
 			return;
 		}
 		int uneditableOffset = panel.getUneditableOffset();
+		
+		text = text.replaceAll("\n", "\n   "); //TODO, find better solution here
 		
 		if (offset < uneditableOffset)
 		{

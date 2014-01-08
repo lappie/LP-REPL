@@ -8,7 +8,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  rascal;bundle-version="0.6.2",
  org.eclipse.imp.pdb.values;bundle-version="0.4.1",
- rascal_eclipse;bundle-version="0.6.2"
+ rascal_eclipse;bundle-version="0.6.2",
+ org.eclipse.core.commands,
+ org.eclipse.ui.workbench
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.core.resources

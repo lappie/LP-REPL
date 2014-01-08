@@ -31,7 +31,7 @@ public class RascalEvaluator implements IEvaluator {
 	private final int LINE_LIMIT = 100; //TODO
 	
 	@Override
-	public boolean completeStatement(String command) {
+	public boolean isComplete(String command) {
 		try {
 			evaluator.parseCommand(null, command, URIUtil.rootScheme("prompt"));
 		} catch (ParseError pe) {
@@ -70,8 +70,6 @@ public class RascalEvaluator implements IEvaluator {
 	@Override
 	public void execute(String statement) {
 		try {
-			if(!statement.endsWith(";"))
-				statement += ";";
 			Result<IValue> value = evaluator.eval(null, statement,
 					URIUtil.rootScheme("prompt"));
 			
@@ -83,10 +81,13 @@ public class RascalEvaluator implements IEvaluator {
 		} catch (ParseError pe) {
 			err.write(parseErrorMessage(statement, "prompt", pe));
 		} catch (StaticError e) {
+			System.err.println(3);
 			err.write(staticErrorMessage(e));
 		} catch (Throw e) {
+			System.err.println(2);
 			err.write(throwMessage(e));
 		} catch (Throwable e) {
+			System.err.println(1);
 			err.write(throwableMessage(e, evaluator.getStackTrace()));
 		}
 	}

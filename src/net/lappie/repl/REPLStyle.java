@@ -16,6 +16,9 @@ public class REPLStyle {
 	public final static Color HIGHLIGHT_COLOR = Color.YELLOW;
 	public final static Color BACKGROUND_HIGHLIGHT_COLOR = new Color(205, 205, 205);
 	
+	private Font consoleFont = new Font("Consolas", Font.PLAIN, 12);
+	public static Font statusBarFont = new Font("Verdana", Font.ITALIC, 10);
+	
 	private static REPLStyle me = null;
 	
 	private Style regular;
@@ -28,9 +31,7 @@ public class REPLStyle {
 	private Style keywordToken;
 	
 	private REPLStyle(JTextPane area) {
-		
-		Font font = new Font("Courier", Font.PLAIN, 12);
-		area.setFont(font);
+		area.setFont(consoleFont);
 		area.setForeground(Color.BLACK);
 		
 		

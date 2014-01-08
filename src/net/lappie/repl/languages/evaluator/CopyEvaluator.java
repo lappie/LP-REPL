@@ -9,7 +9,7 @@ public class CopyEvaluator implements IEvaluator
 	private REPLErrorStream err;
 
 	@Override
-	public boolean completeStatement(String statement)
+	public boolean isComplete(String statement)
 	{
 		return true;
 	}

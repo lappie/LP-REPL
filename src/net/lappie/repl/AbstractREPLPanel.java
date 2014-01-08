@@ -3,6 +3,8 @@ package net.lappie.repl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -155,6 +157,27 @@ public abstract class AbstractREPLPanel extends JPanel {
 	public String getTypedCommand() {
 		return getText(commandIndex, document.getLength() - commandIndex);
 	}
+	
+	/**
+	 * Returns the word that is under de cursor. Only returns [a-zA-Z] words, and will return
+	 *  an empty string if there is no word under the cursor. 
+	 * @return
+	 */
+	public String getWordUnderCursor() {
+		
+		//we cannot search backward, so we start from the beginning: 
+		String text = getAllText();
+		int index = getCaretPosition();
+		Pattern pattern = Pattern.compile("[a-zA-Z]+"); //test version, this is not perfect. For example words between quotes
+		Matcher matcher = pattern.matcher(text);
+		while(matcher.find()) {
+			if(matcher.start() > index)
+				return "";
+			if(matcher.start() <= index && matcher.end() >= index)
+				return getText(matcher.start(), matcher.end()-matcher.start());
+		}
+		return "";
+	}
 
 	private void add(String text, AttributeSet style) {
 		try {
@@ -213,10 +236,12 @@ public abstract class AbstractREPLPanel extends JPanel {
 	
 	public void setCommand(String command) {
 		removeCommand();
+		command = command.replaceAll("\n", "\n" + OUT_SYMBOL);
 		add(command, styles.getRegular());
 	}
 
 	protected void addCommand(String command) {
+		command = command.replaceAll("\n", "\n" + OUT_SYMBOL);
 		add(command, styles.getRegular());
 	}
 
@@ -232,6 +257,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 		/*add(OUT_SYMBOL, styles.getRegular());
 		parseOutput(output);
 		add("\n", styles.getRegular());*/
+		output = output.replaceAll("\n", "\n" + OUT_SYMBOL);//TODO, find better solution
 		add(OUT_SYMBOL + output + "\n", styles.getRegular());
 	}
 

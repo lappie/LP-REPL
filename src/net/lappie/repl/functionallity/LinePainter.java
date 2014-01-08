@@ -116,7 +116,7 @@ public class LinePainter implements Highlighter.HighlightPainter, CaretListener,
 					
 					// Remove the highlighting from the previously highlighted line
 					
-					if (lastView.y != currentView.y) {
+					if (lastView != null && lastView.y != currentView.y) {
 						component.repaint(0, lastView.y, component.getWidth(), lastView.height);
 						lastView = currentView;
 					}

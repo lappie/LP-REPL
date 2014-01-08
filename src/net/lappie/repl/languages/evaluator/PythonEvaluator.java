@@ -17,7 +17,7 @@ public class PythonEvaluator implements IEvaluator
 	private OutputStream dummyOut = new DummyOutputStream();
 
 	@Override
-	public boolean completeStatement(String statement)
+	public boolean isComplete(String statement)
 	{
 		//TODO: make flush system!
 		python.setOut(dummyOut);

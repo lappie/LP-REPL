@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import net.lappie.repl.functionallity.DocumentREPLFilter;
+import net.lappie.repl.functionallity.REPLDocumentFilter;
 import net.lappie.repl.history.Command;
 import net.lappie.repl.history.CommandType;
 import net.lappie.repl.languages.IREPLSettings;
@@ -28,7 +28,7 @@ import net.lappie.repl.languages.evaluator.IEvaluator;
 public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	private IEvaluator evaluator;
-	protected DocumentREPLFilter documentFilter = new DocumentREPLFilter(this);
+	protected REPLDocumentFilter documentFilter = new REPLDocumentFilter(this);
 	
 	protected IREPLSettings settings;
 	private REPLOutputStream output = new REPLOutputStream(this);
@@ -96,7 +96,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	public void evaluate() {
 		String command = getTypedCommand();
-		if(!evaluator.completeStatement(command)) {
+		if(!evaluator.isComplete(command)) {
 			addNewOutputLine();
 			return;
 		}

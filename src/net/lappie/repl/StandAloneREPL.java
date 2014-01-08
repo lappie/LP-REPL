@@ -3,9 +3,6 @@ package net.lappie.repl;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -35,7 +32,7 @@ import net.lappie.repl.languages.RascalSettings;
  * @author Lappie
  *
  */
-public class StandAloneREPL implements ActionListener, ItemListener {
+public class StandAloneREPL {
 	private JFrame frame;
 	private ExtendedREPLPanel replPanel;
 	private IREPLSettings settings;
@@ -82,9 +79,9 @@ public class StandAloneREPL implements ActionListener, ItemListener {
 	}
 
 	private ExtendedREPLPanel createREPLPanel() {
-		// settings = new LispSettings();
-		// settings = new PythonSettings();
-		// settings = new CopySettings();
+		//settings = new LispSettings();
+		//settings = new PythonSettings();
+		//settings = new CopySettings();
 		settings = new RascalSettings();
 		return new ExtendedREPLPanel(settings);
 	}
@@ -229,17 +226,5 @@ public class StandAloneREPL implements ActionListener, ItemListener {
 				new StandAloneREPL();
 			}
 		});
-	}
-
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 }

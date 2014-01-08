@@ -44,9 +44,11 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private IREPLExtension loadedExtention = null;
 
 	private StatusBar statusBar = new StatusBar(AbstractREPLPanel.WIDTH);
+	private IREPLSettings settings;
 
 	public ExtendedREPLPanel(IREPLSettings settings) {
 		super(settings);
+		this.settings = settings;
 		loadKeys();
 
 		//The painters for background colors: 
@@ -125,7 +127,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 			loadedExtention.execute();
 			return;
 		}
-
+		
 		super.evaluate();
 	}
 
@@ -138,6 +140,9 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		addKeyAction("HOME", new HomeCommand());
 		addKeyAction("shift HOME", new ShiftHomeCommand());
 		addKeyAction("ESCAPE", new EscapeCommand());
+		
+		if(settings.hasFunctionHelpCommand())
+			addKeyAction("F2", new FunctionHelpCommand());
 	}
 
 	private class KeyExtensionLoader extends AbstractAction {
@@ -154,6 +159,17 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 			documentListener.loadExtension(extention);
 		}
 	}
+	
+	private class FunctionHelpCommand extends AbstractAction {
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			String functionName = getWordUnderCursor();
+			if(functionName.length() > 0)
+				settings.getFunctionHelpProvider().performFunctionHelp(functionName);
+		}
+	}
+	
+	
 
 	private class InsertBreakCommand extends AbstractAction {
 		@Override

@@ -5,7 +5,7 @@ import net.lappie.repl.REPLOutputStream;
 
 public interface IEvaluator
 {	
-	public boolean completeStatement(String statement);
+	public boolean isComplete(String statement);
 	
 	public void clear();
 	
@@ -16,9 +16,9 @@ public interface IEvaluator
 	 * It is responsible for handling any error that might be given, and keeping track of its state
 	 * if that is required of this evaluator. 
 	 */
-	public void execute(String statement);
+	public void execute(String statement); //TODO, return value
 	
-	public void setOutputStream(REPLOutputStream out);
+	public void setOutputStream(REPLOutputStream out); //TODO 
 	
 	public void setErrorStream(REPLErrorStream err);
 	

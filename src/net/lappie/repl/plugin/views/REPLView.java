@@ -11,6 +11,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
 public class REPLView extends ViewPart{
@@ -19,6 +20,10 @@ public class REPLView extends ViewPart{
 
 	private Composite mySwing;
 	private Frame mySwingFrame;
+	
+	public REPLView() {
+		super();
+	}
 	
 	
 	@Override
@@ -33,8 +38,23 @@ public class REPLView extends ViewPart{
 		IREPLSettings settings = new RascalSettings();
 		replPanel = new ExtendedREPLPanel(settings);
 		
+		
 		setPartName(replPanel.getName());
 		mySwingFrame.add(replPanel);
+		
+		/*org.eclipse.swt.graphics.Cursor waitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
+		
+		if(Display.getDefault() != null && Display.getDefault().getActiveShell() != null)
+			Display.getDefault().getActiveShell().setCursor(waitCursor);
+		*/
+		//Cursor waitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
+		//parent.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+		//Display.getDefault().getActiveShell().setCursor(waitCursor);
+
+		//This will make sure we are in the right context so that Commands (keys) only work for us
+		IContextService contextService = (IContextService)getSite().getService(IContextService.class);
+		contextService.activateContext("rascal-repl.standalone2.view.context");
+
 	}
 
 	@Override

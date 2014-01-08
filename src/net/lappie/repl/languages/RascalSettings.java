@@ -4,8 +4,13 @@ import java.io.File;
 
 import net.lappie.repl.languages.evaluator.IEvaluator;
 import net.lappie.repl.languages.evaluator.RascalEvaluator;
+import net.lappie.repl.languages.functionallity.IFunctionHelpProvider;
+import net.lappie.repl.languages.functionallity.RascalFunctionHelpProvider;
 
 public class RascalSettings implements IREPLSettings {
+	
+	private RascalFunctionHelpProvider functionHelpProvider = new RascalFunctionHelpProvider();
+	
 	@Override
 	public IEvaluator getEvaluator() {
 		return new RascalEvaluator();
@@ -26,6 +31,16 @@ public class RascalSettings implements IREPLSettings {
 		String fileNameWithoutExt = file.getName()
 				.replaceFirst("[.][^.]+$", "");
 		return "import " + fileNameWithoutExt;
+	}
+
+	@Override
+	public boolean hasFunctionHelpCommand() {
+		return true;
+	}
+
+	@Override
+	public IFunctionHelpProvider getFunctionHelpProvider() {
+		return functionHelpProvider;
 	}
 
 }

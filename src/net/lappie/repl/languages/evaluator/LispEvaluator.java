@@ -21,7 +21,7 @@ public class LispEvaluator implements IEvaluator
 	}
 
 	@Override
-	public boolean completeStatement(String statement)
+	public boolean isComplete(String statement)
 	{
 		return true;
 	}
