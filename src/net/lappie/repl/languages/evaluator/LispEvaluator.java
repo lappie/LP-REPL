@@ -38,6 +38,7 @@ public class LispEvaluator implements IEvaluator
 		try
 		{
 			LispValue result = lisp.eval(statement);
+			//lisp.getSymbolTable().
 			out.write(result.toString());
 		}
 		catch (Exception e)
@@ -58,16 +59,19 @@ public class LispEvaluator implements IEvaluator
 		this.err = err;
 	}
 	
+	@Override
 	public String getName()
 	{
 		return "Lisp";
 	}
 	
+	@Override
 	public String getLanguage()
 	{
 		return "Lisp";
 	}
 	
+	@Override
 	public String getVersion()
 	{
 		return "0.1";

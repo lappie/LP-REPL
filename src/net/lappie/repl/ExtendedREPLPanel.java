@@ -20,7 +20,7 @@ import net.lappie.repl.functionallity.WordSelectionListener;
 import net.lappie.repl.functionallity.extensions.IREPLExtension;
 import net.lappie.repl.functionallity.extensions.SearchExtension;
 import net.lappie.repl.languages.IREPLSettings;
-import net.lappie.repl.languages.PythonSettings;
+import net.lappie.repl.languages.RascalSettings;
 
 /**
  * Creates the BasicREPL with extended usability features: 
@@ -198,10 +198,28 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		}
 	}
 
+	/**
+	 * The Escape Commands has different functions: 
+	 *  - Reset the history counter
+	 *  - Clear the command path
+	 *  - Return to command Mode (stop any extensions)
+	 *  - Stop any current running evaluation
+	 * @author Lappie
+	 *
+	 */
 	private class EscapeCommand extends AbstractAction {
 		@Override
 		public void actionPerformed(ActionEvent ev) {
+			System.out.println("ESC pressed");
+			if(currentExecution!= null && !currentExecution.isDone()) { //stop any current running evaluation.
+				System.out.println("Stopping running thread");
+				currentExecution.cancel(true);
+				currentExecution.done();
+				System.out.println("Stopped");
+				return;
+			}
 			historyIndex = history.size(); //reset counter
+			System.out.println(historyIndex);
 			setCommand("");
 			setMode(COMMAND_SYMBOL);
 
@@ -245,8 +263,9 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private class HistoryUpCommand extends AbstractAction {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			historyIndex -= historyIndex >= 0 ? 1 : 0;
+			historyIndex--;
 			if (historyIndex < 0) {
+				historyIndex = -1;
 				setCommand("");
 				return;
 			}
@@ -257,8 +276,9 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private class HistoryDownCommand extends AbstractAction {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			historyIndex += historyIndex < commandHistory.size() ? 1 : 0;
-			if (historyIndex == commandHistory.size()) {
+			historyIndex++;
+			if (historyIndex >= commandHistory.size()) {
+				historyIndex = commandHistory.size(); //don't let it go up
 				setCommand("");
 				return;
 			}
@@ -275,7 +295,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				frame.setVisible(true);
 
 				ExtendedREPLPanel x = new ExtendedREPLPanel(
-						new PythonSettings());
+						new RascalSettings());
 				x.addExtension(new SearchExtension(x));
 
 				frame.setContentPane(x);

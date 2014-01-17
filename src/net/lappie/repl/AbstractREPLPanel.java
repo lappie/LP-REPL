@@ -36,6 +36,8 @@ public abstract class AbstractREPLPanel extends JPanel {
 	private final int PANEL_WIDTH = 500;
 	private final int PANEL_HEIGHT = 250;
 
+	private final int TAB_SIZE = 4;
+	
 	protected final String COMMAND_SYMBOL = ">> ";
 	private final String OUT_SYMBOL = "   ";
 
@@ -259,6 +261,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 		add("\n", styles.getRegular());*/
 		output = output.replaceAll("\n", "\n" + OUT_SYMBOL);//TODO, find better solution
 		add(OUT_SYMBOL + output + "\n", styles.getRegular());
+		setCursorToEnd();
 	}
 
 	protected void addError(String error) {

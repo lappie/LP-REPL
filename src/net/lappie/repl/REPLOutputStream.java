@@ -3,9 +3,6 @@ package net.lappie.repl;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.lappie.repl.history.Command;
-import net.lappie.repl.history.CommandType;
-
 public class REPLOutputStream extends OutputStream {
 	private BasicREPLPanel panel;
 	
@@ -39,7 +36,6 @@ public class REPLOutputStream extends OutputStream {
 	public void write(String output) {
 		if(panel == null)
 			return;
-		panel.getHistory().add(new Command(output, CommandType.OUTPUT));
 		panel.addOutput(output);
 	}
 	

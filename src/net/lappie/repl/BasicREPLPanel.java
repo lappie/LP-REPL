@@ -34,7 +34,15 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	protected ArrayList<Command> history = new ArrayList<>();
 	protected ArrayList<String> commandHistory = new ArrayList<>();
-	protected int historyIndex = 0; // if scrolling through history this will hold where we are
+	
+	/**
+	 * This will hold where we are when scrolling through history. 
+	 * Goes from -1 (empty), 0 (first command), ..., history.length-1 (last executed command), history.length (empty) 
+	 */
+	protected int historyIndex = 0;
+	
+	protected CommandExecutor currentExecution = null;
+	
 	
 	public BasicREPLPanel(IREPLSettings settings) {
 		super();
@@ -105,33 +113,24 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		history.add(new Command(command, CommandType.COMMAND));
 		commandHistory.add(command);
 		historyIndex = commandHistory.size();
+		System.out.println(historyIndex);
+		
+		documentFilter.disableCompletely();
 	}
 	
 	private void doAfterExecution(String command) {
 		addCommandMarker();
-		setCursorToEnd();
+		//setCursorToEnd();
 	}
 	
 	
-	public void forceEvaluate(final String command) { //Warning: if changing this function, then also pay attention to ExecuteTasks
-		addNewLine();
-		doBeforeExecution(command);
-		
-		documentFilter.disableCompletely();
-		ExecuteTask et = new ExecuteTask(command);
-		et.execute();
+	public void forceEvaluate(final String command) { 
+		currentExecution = new CommandExecutor(command);
+		currentExecution.execute();
 	}
-	
-	public void executeCommand(String command) {
-		addCommand(command);
-		forceEvaluate();
-	}
-	
 	
 	public void executeCommands(ArrayList<String> commands) {
-		documentFilter.disableCompletely();
-		
-		ExecuteTasks et = new ExecuteTasks(commands);
+		CommandExecutor et = new CommandExecutor(commands);
 		et.execute();
 	}
 	
@@ -142,23 +141,27 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		}
 	}
 	
-	private class ExecuteTasks extends SwingWorker<Void, Void> {
+	protected class CommandExecutor extends SwingWorker<Void, Void> {
 
 		private ArrayList<String> commands;
 		
-		public ExecuteTasks(ArrayList<String> commands) {
+		public CommandExecutor(ArrayList<String> commands) {
 			this.commands = commands;
+		}
+		
+		public CommandExecutor(String command) {
+			this.commands = new ArrayList<String>();
+			this.commands.add(command);
 		}
 		
 		@Override
 		protected Void doInBackground() throws Exception {
 			for(String command : commands) {
-				doBeforeExecution(command);
-				
-				addCommand(command);
+				setCommand(command);
 				addNewLine();
-				evaluator.execute(command);
 				
+				doBeforeExecution(command);
+				evaluator.execute(command); //TODO return value, catch here and publish here
 				doAfterExecution(command);
 			}
 			return null;
@@ -167,28 +170,6 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		@Override
 		protected void done() {
 			documentFilter.enableCompletely();
-		}
-	}
-	
-	private class ExecuteTask extends SwingWorker<Void, Void> {
-
-		private String command;
-		
-		public ExecuteTask(String command) {
-			this.command = command;
-		}
-		
-		@Override
-		protected Void doInBackground() throws Exception {
-			evaluator.execute(command);
-			doAfterExecution(command);
-			return null;
-		}
-		
-		@Override
-		protected void done() {
-			documentFilter.enableCompletely();
-			setCursorToEnd();
 		}
 	}
 	
