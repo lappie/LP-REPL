@@ -16,6 +16,8 @@ import javax.swing.text.ViewFactory;
 /**
  * Word wrap for a styled editor that breaks of too long words so that wordwrap can be applied
  * 
+ * Also replaces tab-size. 
+ * 
  * @author Lappie
  * 
  */
@@ -84,7 +86,7 @@ class CustomTabParagraphView extends ParagraphView {
 	public float nextTabStop(float x, int tabOffset) {
         TabSet tabs = getTabSet();
         if(tabs == null) {
-            // a tab every 72 pixels.
+            // a tab every so many pixels.
             return getTabBase() + (((int)x / LongWordWrapEditorKit.TAB_SIZE + 1) * LongWordWrapEditorKit.TAB_SIZE);
         }
 

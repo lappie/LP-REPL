@@ -11,7 +11,6 @@ import net.lappie.repl.REPLErrorStream;
 import net.lappie.repl.REPLOutputStream;
 
 import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.type.Type;
 import org.rascalmpl.interpreter.Evaluator;
 import org.rascalmpl.interpreter.control_exceptions.Throw;
 import org.rascalmpl.interpreter.env.GlobalEnvironment;
@@ -27,8 +26,6 @@ public class RascalEvaluator implements IEvaluator {
 	private Evaluator evaluator;
 	private REPLOutputStream out = null;
 	private REPLErrorStream err = null;
-	
-	private final int LINE_LIMIT = 500; //TODO
 	
 	@Override
 	public boolean isComplete(String command) {
@@ -50,18 +47,15 @@ public class RascalEvaluator implements IEvaluator {
 
 	@Override
 	public void clear() {
-		load(); //reload the evaluator;
+		load(this.out, this.err); //reload the evaluator;
 	}
-	/*
-	private class NullOutputStream extends OutputStream {
-		  @Override
-		  public void write(int b) throws IOException {
-		  }
-		}*/
 	
-	public void load() {
-		PrintWriter pwOut = new PrintWriter(this.out);
-		PrintWriter pwErr = new PrintWriter(this.err);
+	@Override
+	public void load(REPLOutputStream out, REPLErrorStream err) {
+		this.out = out;
+		this.err = err;
+		PrintWriter pwOut = new PrintWriter(out);
+		PrintWriter pwErr = new PrintWriter(err);
 
 		// TODO
 		GlobalEnvironment heap = new GlobalEnvironment();
@@ -74,44 +68,22 @@ public class RascalEvaluator implements IEvaluator {
 	}
 
 	@Override
-	public void execute(String statement) {
+	public EvalResult execute(String statement) {
 		try {
 			Result<IValue> value = evaluator.eval(null, statement,
 					URIUtil.rootScheme("prompt"));
 			
-			IValue v = value.getValue();
-			Type type = value.getType();
-			
-			if(v != null && type != null)
-				out.write(value.toString(LINE_LIMIT));
+			return new EvalResult(value.getValue(), value.getType());
 		} catch (ParseError pe) {
-//			System.err.println("Parse error on command: " + statement);
-//			System.err.println(pe.getMessage());
-			err.write(parseErrorMessage(statement, "prompt", pe));
+			
+			return new EvalResult(parseErrorMessage(statement, "prompt", pe));
 		} catch (StaticError e) {
-//			System.err.println("Static error on command: " + statement);
-//			System.err.println(e.getMessage());
-			err.write(staticErrorMessage(e));
+			return new EvalResult(staticErrorMessage(e));
 		} catch (Throw e) {
-//			System.err.println("Throw on command: " + statement);
-//			System.err.println(e.getMessage());
-			err.write(throwMessage(e));
+			return new EvalResult(throwMessage(e));
 		} catch (Throwable e) {
-//			System.err.println("Throwable on command: " + statement);
-//			System.err.println(e.getMessage());
-			err.write(throwableMessage(e, evaluator.getStackTrace()));
+			return new EvalResult(throwableMessage(e, evaluator.getStackTrace()));
 		}
-	}
-
-	@Override
-	public void setOutputStream(REPLOutputStream out) {
-		this.out = out;
-	}
-
-	@Override
-	public void setErrorStream(REPLErrorStream err) {
-		this.err = err;
-		load(); //TODO: improve interface
 	}
 
 	@Override
@@ -125,7 +97,7 @@ public class RascalEvaluator implements IEvaluator {
 	}
 
 	@Override
-	public String getVersion() {
-		return "0.1";
+	public String getLanguageVersion() {
+		return "0.1"; //TODO 
 	}
 }

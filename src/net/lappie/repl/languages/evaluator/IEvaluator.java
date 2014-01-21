@@ -3,6 +3,7 @@ package net.lappie.repl.languages.evaluator;
 import net.lappie.repl.REPLErrorStream;
 import net.lappie.repl.REPLOutputStream;
 
+
 public interface IEvaluator
 {	
 	public boolean isComplete(String statement);
@@ -16,15 +17,13 @@ public interface IEvaluator
 	 * It is responsible for handling any error that might be given, and keeping track of its state
 	 * if that is required of this evaluator. 
 	 */
-	public void execute(String statement); //TODO, return value
-	
-	public void setOutputStream(REPLOutputStream out); //TODO 
-	
-	public void setErrorStream(REPLErrorStream err);
+	public EvalResult execute(String statement); 
 	
 	public String getName();
 	
 	public String getLanguage();
 	
-	public String getVersion();
+	public String getLanguageVersion();
+	
+	public void load(REPLOutputStream out, REPLErrorStream err);
 }

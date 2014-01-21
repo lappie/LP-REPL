@@ -11,6 +11,16 @@ public interface IREPLSettings
 	
 	public String getSyntaxType();
 	
+	/**
+	 * Return the output that needs to be done to add to the REPL display when 
+	 * a statement is not yet finished but is executed. 
+	 * 
+	 * Returns an empty string if nothing has to happen. 
+	 * Use this for auto indentation. E.g. "\n\t";
+	 * @return
+	 */
+	public String getPostUnfinishedStatement(); 
+	
 	public boolean hasLoadModuleCommand();
 
 	public String getLoadModuleCommand(File path);

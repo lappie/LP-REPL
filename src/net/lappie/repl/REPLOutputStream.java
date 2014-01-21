@@ -3,7 +3,18 @@ package net.lappie.repl;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.eclipse.imp.pdb.facts.IValue;
+import org.eclipse.imp.pdb.facts.type.Type;
+
+/**
+ * This class is an Outputstream so that evaluator can write something when the user uses the print-function. 
+ * 
+ * The write(type, value) method is used for printing the results. 
+ * @author Lappie
+ *
+ */
 public class REPLOutputStream extends OutputStream {
+	
 	private BasicREPLPanel panel;
 	
 	private boolean trim = false;
@@ -45,6 +56,11 @@ public class REPLOutputStream extends OutputStream {
 	
 	public void println(String s) {
 		write(s);
+	}
+	
+	public void write(Type type, IValue value) {
+		if(type != null && value != null)
+			panel.addOutput(type.toString() + ": " + value.toString());
 	}
 	
 	public void setTrim(boolean on) {

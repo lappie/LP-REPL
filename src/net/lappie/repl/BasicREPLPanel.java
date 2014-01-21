@@ -14,6 +14,7 @@ import net.lappie.repl.functionallity.REPLDocumentFilter;
 import net.lappie.repl.history.Command;
 import net.lappie.repl.history.CommandType;
 import net.lappie.repl.languages.IREPLSettings;
+import net.lappie.repl.languages.evaluator.EvalResult;
 import net.lappie.repl.languages.evaluator.IEvaluator;
 
 /**
@@ -29,7 +30,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	protected REPLDocumentFilter documentFilter = new REPLDocumentFilter(this);
 	
 	protected IREPLSettings settings;
-	private REPLOutputStream output = new REPLOutputStream(this);
+	private REPLOutputStream out = new REPLOutputStream(this);
 	private REPLErrorStream err = new REPLErrorStream(this);
 	
 	protected ArrayList<Command> history = new ArrayList<>();
@@ -49,8 +50,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		
 		this.settings = settings;
 		this.evaluator = settings.getEvaluator();
-		evaluator.setOutputStream(output);
-		evaluator.setErrorStream(err);
+		evaluator.load(out, err);
 		
 		// load:
 		addDocumentFilter(documentFilter);
@@ -113,14 +113,13 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		history.add(new Command(command, CommandType.COMMAND));
 		commandHistory.add(command);
 		historyIndex = commandHistory.size();
-		System.out.println(historyIndex);
 		
 		documentFilter.disableCompletely();
 	}
 	
-	private void doAfterExecution(String command) {
+	private void doAfterExecution() {
 		addCommandMarker();
-		//setCursorToEnd();
+		setCursorToEnd();
 	}
 	
 	
@@ -161,8 +160,12 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				addNewLine();
 				
 				doBeforeExecution(command);
-				evaluator.execute(command); //TODO return value, catch here and publish here
-				doAfterExecution(command);
+				EvalResult result = evaluator.execute(command);
+				if(result.hasError())
+		    		err.write(result.getError());
+		    	else
+		    		out.write(result.getType(), result.getValue());
+		    	doAfterExecution();
 			}
 			return null;
 		}

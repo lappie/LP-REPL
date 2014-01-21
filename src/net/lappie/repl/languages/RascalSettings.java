@@ -43,4 +43,9 @@ public class RascalSettings implements IREPLSettings {
 		return functionHelpProvider;
 	}
 
+	@Override
+	public String getPostUnfinishedStatement() {
+		return "\n\t"; //TODO Multiple tabs
+	}
+
 }

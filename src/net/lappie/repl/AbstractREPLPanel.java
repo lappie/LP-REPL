@@ -35,8 +35,6 @@ import net.lappie.repl.functionallity.LongWordWrapEditorKit;
 public abstract class AbstractREPLPanel extends JPanel {
 	private final int PANEL_WIDTH = 500;
 	private final int PANEL_HEIGHT = 250;
-
-	private final int TAB_SIZE = 4;
 	
 	protected final String COMMAND_SYMBOL = ">> ";
 	private final String OUT_SYMBOL = "   ";
@@ -45,11 +43,11 @@ public abstract class AbstractREPLPanel extends JPanel {
 	public static final Color SELECT_BG_COLOR = new Color(0xf0f0f0);
 	public static final Color NEGATIVE_BG_COLOR = new Color(255, 143, 143);
 
-	/**
-	 * Internal we hold the following terms: - command: The command as it is
-	 * typed by the user or will be executed - result: The result of a command -
-	 * commandMode: The mode we're working with. e.g. normal, search,
-	 * historysearch
+	/*
+	 * Internal we hold the following terms: 
+	 * - command: The command as it is typed by the user or will be executed 
+	 * - result: The result of a command 
+	 * - commandMode: The mode we're working with. e.g. normal, search, historysearch
 	 */
 
 	private JTextPane area;
