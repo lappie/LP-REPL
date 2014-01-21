@@ -114,10 +114,15 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		commandHistory.add(command);
 		historyIndex = commandHistory.size();
 		
+		//addOutputSymbol();
+		
 		documentFilter.disableCompletely();
 	}
 	
 	private void doAfterExecution() {
+		if(!onBlankLine()) {
+			addNewLine();
+		}
 		addCommandMarker();
 		setCursorToEnd();
 	}
@@ -161,10 +166,12 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				
 				doBeforeExecution(command);
 				EvalResult result = evaluator.execute(command);
+				out.myFlush();
 				if(result.hasError())
 		    		err.write(result.getError());
 		    	else
 		    		out.write(result.getType(), result.getValue());
+				out.myFlush();
 		    	doAfterExecution();
 			}
 			return null;

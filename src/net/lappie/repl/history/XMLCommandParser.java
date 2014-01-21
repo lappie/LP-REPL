@@ -41,7 +41,7 @@ public class XMLCommandParser {
 	
 	private static Element getEvaluatorElement(IEvaluator evaluator, Document doc) {
 		Element evaluatorElement = doc.createElement("evaluator");
-		evaluatorElement.setAttribute("version", evaluator.getVersion());
+		evaluatorElement.setAttribute("version", evaluator.getLanguageVersion());
 		evaluatorElement.setAttribute("language", evaluator.getLanguage());
 		evaluatorElement.setTextContent(evaluator.getName());
 		
@@ -136,7 +136,7 @@ public class XMLCommandParser {
 					repl.displayWarning("Warning: Language does not match running-language");
 					success = false;
 				}
-				else if(!repl.getEvaluator().getVersion().equals(version)) {
+				else if(!repl.getEvaluator().getLanguageVersion().equals(version)) {
 					repl.addStatusMessage("Warning: Evaluator-version does not match");
 					repl.displayWarning("Warning: Evaluator-version does not match");
 					success = false;

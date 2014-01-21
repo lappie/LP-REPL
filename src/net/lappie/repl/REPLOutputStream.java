@@ -19,6 +19,8 @@ public class REPLOutputStream extends OutputStream {
 	
 	private boolean trim = false;
 	
+	private String stack = ""; //TODO BufferedString
+	
 	public REPLOutputStream(BasicREPLPanel panel) {
 		this.panel = panel;
 	}
@@ -44,10 +46,25 @@ public class REPLOutputStream extends OutputStream {
 		write(s);
 	}
 	
+	private final int PRINT_STEP = 100;
+	
 	public void write(String output) {
 		if(panel == null)
 			return;
-		panel.addOutput(output);
+		
+		stack += output; 
+		if(stack.length() < PRINT_STEP)
+			return;
+		forceWriteStack();
+	}
+	
+	private void forceWriteStack() {
+		for(int i = 0; i < stack.length(); i+=PRINT_STEP) { //Long text in pieces
+			int endIndex = i+PRINT_STEP < stack.length() ? i+PRINT_STEP : stack.length();
+			String sub = stack.substring(i, endIndex);
+			panel.addOutput(sub);
+		}
+		stack = "";
 	}
 	
 	public void print(String s) {
@@ -59,11 +76,18 @@ public class REPLOutputStream extends OutputStream {
 	}
 	
 	public void write(Type type, IValue value) {
-		if(type != null && value != null)
+		if(type != null && value != null) {
+			if(!panel.onBlankLine())
+				panel.addNewLine();
 			panel.addOutput(type.toString() + ": " + value.toString());
+		}
 	}
 	
 	public void setTrim(boolean on) {
 		trim = on;
+	}
+	
+	public void myFlush() {
+		forceWriteStack();
 	}
 }

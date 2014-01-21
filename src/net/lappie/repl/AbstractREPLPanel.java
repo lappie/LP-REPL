@@ -35,7 +35,7 @@ import net.lappie.repl.functionallity.LongWordWrapEditorKit;
 public abstract class AbstractREPLPanel extends JPanel {
 	private final int PANEL_WIDTH = 500;
 	private final int PANEL_HEIGHT = 250;
-	
+
 	protected final String COMMAND_SYMBOL = ">> ";
 	private final String OUT_SYMBOL = "   ";
 
@@ -43,11 +43,11 @@ public abstract class AbstractREPLPanel extends JPanel {
 	public static final Color SELECT_BG_COLOR = new Color(0xf0f0f0);
 	public static final Color NEGATIVE_BG_COLOR = new Color(255, 143, 143);
 
-	/*
-	 * Internal we hold the following terms: 
-	 * - command: The command as it is typed by the user or will be executed 
-	 * - result: The result of a command 
-	 * - commandMode: The mode we're working with. e.g. normal, search, historysearch
+	/**
+	 * Internal we hold the following terms: - command: The command as it is
+	 * typed by the user or will be executed - result: The result of a command -
+	 * commandMode: The mode we're working with. e.g. normal, search,
+	 * historysearch
 	 */
 
 	private JTextPane area;
@@ -198,9 +198,9 @@ public abstract class AbstractREPLPanel extends JPanel {
 		}
 	}
 	
-	private void remove(int offset, int length) {
+	private void remove(int offset, int len) {
 		try {
-			document.remove(offset, length);
+			document.remove(offset, len);
 		} catch (BadLocationException e) {
 
 			e.printStackTrace();
@@ -254,12 +254,23 @@ public abstract class AbstractREPLPanel extends JPanel {
 	}
 
 	protected void addOutput(String output) {
-		/*add(OUT_SYMBOL, styles.getRegular());
-		parseOutput(output);
-		add("\n", styles.getRegular());*/
 		output = output.replaceAll("\n", "\n" + OUT_SYMBOL);//TODO, find better solution
-		add(OUT_SYMBOL + output + "\n", styles.getRegular());
-		setCursorToEnd();
+		if(onBlankLine())
+			addOutputSymbol();
+		add(output, styles.getRegular());
+	}
+	
+	protected boolean onBlankLine() {
+		return getText(document.getLength()-1, 1).equals("\n"); 
+	}
+	
+	protected boolean onEmptyOutputLine() {
+		int l = OUT_SYMBOL.length();
+		return getText(document.getLength()-l-1, l+1).equals("\n"+OUT_SYMBOL); 
+	}
+	
+	protected void addOutputSymbol() {
+		add(OUT_SYMBOL, styles.getRegular());
 	}
 
 	protected void addError(String error) {
