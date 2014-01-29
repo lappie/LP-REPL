@@ -19,7 +19,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.lappie.repl.BasicREPLPanel;
 import net.lappie.repl.ExtendedREPLPanel;
-import net.lappie.repl.languages.evaluator.IEvaluator;
+import net.lappie.repl.languages.IEvaluator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class XMLCommandParser {
+public class XMLSessionParser {
 	private static Element getEnvironmentElement(Document doc) {
 		Element environment = doc.createElement("environment");
 		environment.setAttribute("OS-name", System.getProperty("os.name"));

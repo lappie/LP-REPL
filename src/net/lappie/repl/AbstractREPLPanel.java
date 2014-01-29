@@ -36,8 +36,11 @@ public abstract class AbstractREPLPanel extends JPanel {
 	private final int PANEL_WIDTH = 500;
 	private final int PANEL_HEIGHT = 250;
 
-	protected final String COMMAND_SYMBOL = ">> ";
-	private final String OUT_SYMBOL = "   ";
+	private final String MESSAGE_SYMBOL = "** "; //The REPL displaying information. 
+	private final String REPL_COMMAND_SYMBOL = ">  "; // The REPL informing of an executed command
+	private final String RESULT_SYMBOL = "-> "; 
+	protected final String COMMAND_SYMBOL = ">> "; //user entering statements
+	private final String OUT_SYMBOL = "   "; //also used for errors
 
 	public static final Color CURRENT_LINE_BG_COLOR = new Color(200, 215, 255);
 	public static final Color SELECT_BG_COLOR = new Color(0xf0f0f0);
@@ -52,7 +55,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 
 	private JTextPane area;
 	private Document document;
-	protected REPLStyle styles;
+	protected StyleSettings styles;
 
 	// Also used as identifier:
 	private final String commandSymbol = ">> ";
@@ -64,7 +67,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 		super(new BorderLayout());
 
 		loadArea();
-		styles = REPLStyle.getInstance(area);
+		styles = StyleSettings.getInstance(area);
 	}
 
 	private void loadArea() {
@@ -239,26 +242,6 @@ public abstract class AbstractREPLPanel extends JPanel {
 		//command = command.replaceAll("\n", "\n" + OUT_SYMBOL);
 		add(command, styles.getRegular());
 	}
-
-	protected void addCommand(String command) {
-		command = command.replaceAll("\n", "\n" + OUT_SYMBOL); //TODO ugly, fix this
-		add(command, styles.getRegular());
-	}
-
-	protected void addREPLCommand(String command) {
-		add(command + "\n", styles.getRegular());
-	}
-
-	protected void addInfo(String info) {
-		add(OUT_SYMBOL + info + "\n", styles.getInfo());
-	}
-
-	protected void addOutput(String output) {
-		output = output.replaceAll("\n", "\n" + OUT_SYMBOL);//TODO, find better solution
-		if(onBlankLine())
-			addOutputSymbol();
-		add(output, styles.getRegular());
-	}
 	
 	protected boolean onBlankLine() {
 		return getText(document.getLength()-1, 1).equals("\n"); 
@@ -273,28 +256,52 @@ public abstract class AbstractREPLPanel extends JPanel {
 		add(OUT_SYMBOL, styles.getRegular());
 	}
 
+	/////////////////////////////// COMMAND TYPES ////////////////////////////////
+	protected void addCommand(String command) {
+		command = command.replaceAll("\n", "\n" + OUT_SYMBOL); //TODO ugly, fix this
+		add(command, styles.getRegular());
+	}
+	
+	protected void addOutput(String output) {
+		output = output.replaceAll("\n", "\n" + OUT_SYMBOL);//TODO, find better solution
+		add(OUT_SYMBOL + output, styles.getRegular());
+	}
+	
 	protected void addError(String error) {
 		add(OUT_SYMBOL + error + "\n", styles.getError());
 	}
-
-	protected void addWarning(String warning) {
-		add(OUT_SYMBOL + warning + "\n", styles.getWarning());
+	
+	protected void addResult(String result) {
+		add(RESULT_SYMBOL + result, styles.getOutput());
 	}
+	
+	//////// REPL COMMANDS ///////
+
+	protected void addMessage(String info) {
+		add(MESSAGE_SYMBOL + info + "\n", styles.getInfo());
+	}
+	
+	protected void addREPLCommand(String command) {
+		add(REPL_COMMAND_SYMBOL + command + "\n", styles.getRegular());
+	}
+
+	protected void addREPLWarning(String warning) {
+		add(REPL_COMMAND_SYMBOL + warning + "\n", styles.getWarning());
+	}
+	
+	protected void addREPLError(String error) {
+		add(REPL_COMMAND_SYMBOL + error + "\n", styles.getError());
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	protected void addNewLine() {
 		add("\n", styles.getRegular());
 	}
 
+	
 	protected void addNewOutputLine() {
 		insert("\n" + OUT_SYMBOL, styles.getRegular());
-	}
-
-	public void messageColorTest() {
-		addInfo("Welcome to LP-REPL");
-		addCommand("print('xx')");
-		addOutput("xx");
-		addREPLCommand("now loading a new file...");
-		addError("File not found");
 	}
 
 	public int getCaretPosition() {

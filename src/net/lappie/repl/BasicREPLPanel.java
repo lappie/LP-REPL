@@ -13,9 +13,9 @@ import javax.swing.SwingWorker;
 import net.lappie.repl.functionallity.REPLDocumentFilter;
 import net.lappie.repl.history.Command;
 import net.lappie.repl.history.CommandType;
-import net.lappie.repl.languages.IREPLSettings;
-import net.lappie.repl.languages.evaluator.EvalResult;
-import net.lappie.repl.languages.evaluator.IEvaluator;
+import net.lappie.repl.languages.AbstractResult;
+import net.lappie.repl.languages.IEvaluator;
+import net.lappie.repl.languages.ILanguageSettings;
 
 /**
  * This class extends the AbstractREPLPanel and adds the default REPL behavior of evaluating 
@@ -29,7 +29,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	private IEvaluator evaluator;
 	protected REPLDocumentFilter documentFilter = new REPLDocumentFilter(this);
 	
-	protected IREPLSettings settings;
+	protected ILanguageSettings settings;
 	private REPLOutputStream out = new REPLOutputStream(this);
 	private REPLErrorStream err = new REPLErrorStream(this);
 	
@@ -45,7 +45,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	protected CommandExecutor currentExecution = null;
 	
 	
-	public BasicREPLPanel(IREPLSettings settings) {
+	public BasicREPLPanel(ILanguageSettings settings) {
 		super();
 		
 		this.settings = settings;
@@ -56,7 +56,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		addDocumentFilter(documentFilter);
 		addKeyAction("ENTER", new ExecuteCommand());
 		
-		addInfo("Welcome to the LP-REPL v0.0.1");
+		addMessage("Welcome to the LP-REPL v0.0.1");
 		addCommandMarker();
 	}
 	
@@ -75,14 +75,21 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	public void displayMessage(String message) {
 		removeCommand();
 		removeCommandMarker();
-		addInfo(message);
+		addMessage(message);
 		addCommandMarker();
 	}
 	
 	public void displayWarning(String warning) {
 		removeCommand();
 		removeCommandMarker();
-		addWarning(warning);
+		addREPLWarning(warning);
+		addCommandMarker();
+	}
+	
+	public void displayError(String error) {
+		removeCommand();
+		removeCommandMarker();
+		addError(error);
 		addCommandMarker();
 	}
 	
@@ -165,12 +172,15 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				addNewLine();
 				
 				doBeforeExecution(command);
-				EvalResult result = evaluator.execute(command);
+				AbstractResult result = evaluator.execute(command);
 				out.myFlush();
 				if(result.hasError())
 		    		err.write(result.getError());
-		    	else
-		    		out.write(result.getType(), result.getValue());
+		    	else {
+		    		String resultString = result.toString();
+		    		if(!resultString.equals(""))
+		    			out.writeResult(resultString);
+		    	}
 				out.myFlush();
 		    	doAfterExecution();
 			}

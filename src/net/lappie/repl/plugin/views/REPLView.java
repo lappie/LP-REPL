@@ -4,8 +4,8 @@ import java.awt.Frame;
 import java.util.ArrayList;
 
 import net.lappie.repl.ExtendedREPLPanel;
-import net.lappie.repl.languages.IREPLSettings;
-import net.lappie.repl.languages.RascalSettings;
+import net.lappie.repl.languages.ILanguageSettings;
+import net.lappie.repl.languages.rascal.RascalSettings;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -46,7 +46,7 @@ public class REPLView extends ViewPart{
 //		if(getViewSite().getSecondaryId() != null)
 //			project = ResourcesPlugin.getWorkspace().getRoot().getProject(getViewSite().getSecondaryId());
 		
-		IREPLSettings settings = new RascalSettings();
+		ILanguageSettings settings = new RascalSettings();
 		replPanel = new ExtendedREPLPanel(settings);
 		repls.add(replPanel);
 		

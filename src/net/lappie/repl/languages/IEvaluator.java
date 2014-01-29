@@ -1,4 +1,6 @@
-package net.lappie.repl.languages.evaluator;
+package net.lappie.repl.languages;
+
+import java.io.File;
 
 import net.lappie.repl.REPLErrorStream;
 import net.lappie.repl.REPLOutputStream;
@@ -17,7 +19,9 @@ public interface IEvaluator
 	 * It is responsible for handling any error that might be given, and keeping track of its state
 	 * if that is required of this evaluator. 
 	 */
-	public EvalResult execute(String statement); 
+	public AbstractResult execute(String statement); 
+	
+	public AbstractResult doImport(String module);
 	
 	public String getName();
 	
@@ -26,4 +30,8 @@ public interface IEvaluator
 	public String getLanguageVersion();
 	
 	public void load(REPLOutputStream out, REPLErrorStream err);
+	
+	public void setWorkspace(File workspace);
+	
+	public File getWorkspace();
 }

@@ -19,8 +19,8 @@ import net.lappie.repl.functionallity.SyntaxHighlightParser;
 import net.lappie.repl.functionallity.WordSelectionListener;
 import net.lappie.repl.functionallity.extensions.IREPLExtension;
 import net.lappie.repl.functionallity.extensions.SearchExtension;
-import net.lappie.repl.languages.IREPLSettings;
-import net.lappie.repl.languages.RascalSettings;
+import net.lappie.repl.languages.ILanguageSettings;
+import net.lappie.repl.languages.rascal.RascalSettings;
 
 /**
  * Creates the BasicREPL with extended usability features: 
@@ -44,17 +44,17 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private IREPLExtension loadedExtention = null;
 
 	private StatusBar statusBar = new StatusBar(AbstractREPLPanel.WIDTH);
-	private IREPLSettings settings;
+	private ILanguageSettings settings;
 
-	public ExtendedREPLPanel(IREPLSettings settings) {
+	public ExtendedREPLPanel(ILanguageSettings settings) {
 		super(settings);
 		this.settings = settings;
 		loadKeys();
 
 		//The painters for background colors: 
-		highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(REPLStyle.HIGHLIGHT_COLOR);
-		backgroundHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(REPLStyle.BACKGROUND_HIGHLIGHT_COLOR);
-		linePainter = new LinePainter(getREPLTextComponent(), REPLStyle.LINE_COLOR); // line highlighter
+		highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(StyleSettings.HIGHLIGHT_COLOR);
+		backgroundHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(StyleSettings.BACKGROUND_HIGHLIGHT_COLOR);
+		linePainter = new LinePainter(getREPLTextComponent(), StyleSettings.LINE_COLOR); // line highlighter
 		
 		//Listeners: 
 		SyntaxHighlightParser parser = new SyntaxHighlightParser(getREPLTextComponent(), styles);
@@ -108,11 +108,11 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	}
 
 	public void showErrorStatus() {
-		linePainter.setColor(REPLStyle.LINE_ERROR_COLOR);
+		linePainter.setColor(StyleSettings.LINE_ERROR_COLOR);
 	}
 
 	public void showNormalStatus() {
-		linePainter.setColor(REPLStyle.LINE_COLOR);
+		linePainter.setColor(StyleSettings.LINE_COLOR);
 	}
 
 	public void addStatusMessage(String message) {
@@ -238,8 +238,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				setCursor(commandIndex);
 			} else {
 				ActionMap actions = getREPLActionMap();
-				Action a = actions.get("caret-begin-line"); // perform original
-															// action.
+				Action a = actions.get("caret-begin-line"); // perform original action.
 				a.actionPerformed(ev);
 			}
 		}
@@ -252,9 +251,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				setCursorSelection(commandIndex);
 			} else {
 				ActionMap actions = getREPLActionMap();
-				Action a = actions.get("selection-begin-line"); // perform
-																// original
-																// action.
+				Action a = actions.get("selection-begin-line"); // perform original action.
 				a.actionPerformed(ev);
 			}
 		}

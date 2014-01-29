@@ -1,4 +1,4 @@
-package net.lappie.repl.languages.functionallity;
+package net.lappie.repl.languages;
 
 /**
  * An interface for a provider of help-text to a user corresponding to a function. 

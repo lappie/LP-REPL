@@ -1,9 +1,11 @@
-package net.lappie.repl.languages.functionallity;
+package net.lappie.repl.languages.rascal;
 
 import java.awt.Desktop;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+
+import net.lappie.repl.languages.IFunctionHelpProvider;
 
 public class RascalFunctionHelpProvider implements IFunctionHelpProvider{
 	

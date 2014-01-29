@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.StyledDocument;
 
-import net.lappie.repl.REPLStyle;
+import net.lappie.repl.StyleSettings;
 
 import org.eclipse.imp.pdb.facts.IConstructor;
 import org.eclipse.imp.pdb.facts.ISourceLocation;
@@ -24,9 +24,9 @@ import org.rascalmpl.parser.uptr.action.NoActionExecutor;
 public class SyntaxHighlightParser {
 	
 	private JTextPane area;
-	private REPLStyle styles;
+	private StyleSettings styles;
 	
-	public SyntaxHighlightParser(JTextPane area, REPLStyle styles) {
+	public SyntaxHighlightParser(JTextPane area, StyleSettings styles) {
 		this.area = area;
 		this.styles = styles;
 	}

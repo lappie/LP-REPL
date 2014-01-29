@@ -3,15 +3,13 @@ package net.lappie.repl;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.type.Type;
-
 /**
- * This class is an Outputstream so that evaluator can write something when the user uses the print-function. 
+ * This class is an Outputstream so that evaluator can write something when the user uses the print-function.
  * 
- * The write(type, value) method is used for printing the results. 
+ * The write(type, value) method is used for printing the results.
+ * 
  * @author Lappie
- *
+ * 
  */
 public class REPLOutputStream extends OutputStream {
 	
@@ -19,7 +17,7 @@ public class REPLOutputStream extends OutputStream {
 	
 	private boolean trim = false;
 	
-	private String stack = ""; //TODO BufferedString
+	private String stack = ""; // TODO BufferedString
 	
 	public REPLOutputStream(BasicREPLPanel panel) {
 		this.panel = panel;
@@ -49,18 +47,18 @@ public class REPLOutputStream extends OutputStream {
 	private final int PRINT_STEP = 100;
 	
 	public void write(String output) {
-		if(panel == null)
+		if (panel == null)
 			return;
 		
-		stack += output; 
-		if(stack.length() < PRINT_STEP)
+		stack += output;
+		if (stack.length() < PRINT_STEP)
 			return;
 		forceWriteStack();
 	}
 	
 	private void forceWriteStack() {
-		for(int i = 0; i < stack.length(); i+=PRINT_STEP) { //Long text in pieces
-			int endIndex = i+PRINT_STEP < stack.length() ? i+PRINT_STEP : stack.length();
+		for (int i = 0; i < stack.length(); i += PRINT_STEP) { // Long text in pieces
+			int endIndex = i + PRINT_STEP < stack.length() ? i + PRINT_STEP : stack.length();
 			String sub = stack.substring(i, endIndex);
 			panel.addOutput(sub);
 		}
@@ -75,12 +73,11 @@ public class REPLOutputStream extends OutputStream {
 		write(s);
 	}
 	
-	public void write(Type type, IValue value) {
-		if(type != null && value != null) {
-			if(!panel.onBlankLine())
-				panel.addNewLine();
-			panel.addOutput(type.toString() + ": " + value.toString());
-		}
+	public void writeResult(String result) { // TODO
+	
+		if (!panel.onBlankLine())
+			panel.addNewLine();
+		panel.addResult(result);
 	}
 	
 	public void setTrim(boolean on) {

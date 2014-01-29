@@ -8,7 +8,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-public class REPLStyle {
+public class StyleSettings {
 	
 	public final static Color LINE_COLOR = new Color(202, 227, 251);
 	public final static Color LINE_ERROR_COLOR = new Color(255, 180, 180);
@@ -19,9 +19,10 @@ public class REPLStyle {
 	private Font consoleFont = new Font("Consolas", Font.PLAIN, 12);
 	public static Font statusBarFont = new Font("Verdana", Font.ITALIC, 10);
 	
-	private static REPLStyle me = null;
+	private static StyleSettings me = null;
 	
 	private Style regular;
+	private Style output; 
 	private Style info;
 	private Style italic;
 	private Style error;
@@ -30,7 +31,7 @@ public class REPLStyle {
 	private Style stringToken;
 	private Style keywordToken;
 	
-	private REPLStyle(JTextPane area) {
+	private StyleSettings(JTextPane area) {
 		area.setFont(consoleFont);
 		area.setForeground(Color.BLACK);
 		
@@ -40,6 +41,9 @@ public class REPLStyle {
 		
 		info = area.addStyle("info", regular);
 		StyleConstants.setForeground(info, Color.BLUE);
+		
+		output = area.addStyle("output", regular);
+		StyleConstants.setForeground(output, new Color(30, 80, 20));
 		
 		// Create an italic style
 		italic = area.addStyle("italic", regular);
@@ -62,9 +66,9 @@ public class REPLStyle {
 		StyleConstants.setBold(keywordToken, true);
 	}
 	
-	public static REPLStyle getInstance(JTextPane area) {
+	public static StyleSettings getInstance(JTextPane area) {
 		if(me == null)
-			me = new REPLStyle(area);
+			me = new StyleSettings(area);
 		return me;
 	}
 	
@@ -74,6 +78,10 @@ public class REPLStyle {
 	
 	public Style getInfo() {
 		return info;
+	}
+	
+	public Style getOutput() {
+		return output;
 	}
 	
 	public Style getItalic() {

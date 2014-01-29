@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
-import net.lappie.repl.REPLStyle;
+import net.lappie.repl.StyleSettings;
 
 public class StatusBar extends JPanel {
 	
@@ -24,7 +24,7 @@ public class StatusBar extends JPanel {
 		
 		statusLabel.setPreferredSize(new Dimension(300, HEIGHT)); //TODO, 300?
 		statusLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		statusLabel.setFont(REPLStyle.statusBarFont);
+		statusLabel.setFont(StyleSettings.statusBarFont);
 		add(Box.createHorizontalGlue());
 		add(statusLabel);
 	}
