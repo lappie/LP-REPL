@@ -16,6 +16,8 @@ public class Settings {
 	
 	public static final String SESSION_FILE_DESCRIPTION = "XML files";
 	
+	public static final String VERSION = "0.21";
+	
 	private static File propertiesFile = new File("repl.properties");
 	private static Properties configFile = new Properties();
 	static {

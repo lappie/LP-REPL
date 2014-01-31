@@ -17,7 +17,10 @@ public class REPLOutputStream extends OutputStream {
 	
 	private boolean trim = false;
 	
-	private String stack = ""; // TODO BufferedString
+	private String output = ""; //this will hold what is printed as a total for saving in the history
+	private String stack = ""; //this will hold a stack, to optimize printing
+	
+	private final int PRINT_STEP = 100;
 	
 	public REPLOutputStream(BasicREPLPanel panel) {
 		this.panel = panel;
@@ -44,7 +47,7 @@ public class REPLOutputStream extends OutputStream {
 		write(s);
 	}
 	
-	private final int PRINT_STEP = 100;
+	
 	
 	public void write(String output) {
 		if (panel == null)
@@ -62,6 +65,7 @@ public class REPLOutputStream extends OutputStream {
 			String sub = stack.substring(i, endIndex);
 			panel.addOutput(sub);
 		}
+		output = new String(stack);
 		stack = "";
 	}
 	
@@ -73,18 +77,13 @@ public class REPLOutputStream extends OutputStream {
 		write(s);
 	}
 	
-	public void writeResult(String result) { // TODO
-	
-		if (!panel.onBlankLine())
-			panel.addNewLine();
-		panel.addResult(result);
-	}
-	
 	public void setTrim(boolean on) {
 		trim = on;
 	}
 	
 	public void myFlush() {
 		forceWriteStack();
+		panel.getHistory().addOutput(output);
+		output = "";
 	}
 }

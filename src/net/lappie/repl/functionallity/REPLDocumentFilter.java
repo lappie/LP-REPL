@@ -28,6 +28,9 @@ public class REPLDocumentFilter extends DocumentFilter
 		enabledREPLFilter = false;
 	}
 	
+	/**
+	 * Allow no changes at all
+	 */
 	public void disableCompletely() {
 		completelyDisabled = true;
 	}	

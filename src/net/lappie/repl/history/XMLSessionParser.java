@@ -23,7 +23,6 @@ import net.lappie.repl.languages.IEvaluator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -80,11 +79,11 @@ public class XMLSessionParser {
 			Element historyElement = doc.createElement("history");
 			lpREPL.appendChild(historyElement);
 			
-			for (Command run : repl.getHistory()) {
-				Element runElement = doc.createElement("output");
+			for (Command run : repl.getHistory().getList()) {
+				Element runElement = doc.createElement(run.getType().toString());
 				historyElement.appendChild(runElement);
 				runElement.setTextContent(run.getText());
-				runElement.setAttribute("type", run.getType().toString());
+				//runElement.setAttribute("type", run.getType().toString());
 			}
 			
 			// write the content into xml file
@@ -132,34 +131,39 @@ public class XMLSessionParser {
 				String version = evaluatorElement.getAttribute("version");
 				// show message if they don't match.
 				if(!repl.getEvaluator().getLanguage().equals(language)) {
-					repl.addStatusMessage("Warning: Language does not match running-language");
-					repl.displayWarning("Warning: Language does not match running-language");
+					String warning = "Warning: Language does not match running-language";
+					repl.addStatusMessage(warning);
+					repl.displayREPLWarning(warning);
 					success = false;
 				}
 				else if(!repl.getEvaluator().getLanguageVersion().equals(version)) {
-					repl.addStatusMessage("Warning: Evaluator-version does not match");
-					repl.displayWarning("Warning: Evaluator-version does not match");
+					String warning = "Warning: Evaluator-version does not match";
+					repl.addStatusMessage(warning);
+					repl.displayREPLWarning(warning);
 					success = false;
 				}
 			}
 			
-			NodeList runList = doc.getElementsByTagName("output");
-			ArrayList<String> commands = new ArrayList<>();
+			NodeList historyList = doc.getElementsByTagName("history");
+			if(historyList.getLength() == 0)
+				return false;
+			Node history = historyList.item(0);
+			ArrayList<Command> commands = new ArrayList<>();
+			historyList = history.getChildNodes();
 			
-			for (int i = 0; i < runList.getLength(); i++) {
-				Node outputNode = runList.item(i);
-				NamedNodeMap nnm = outputNode.getAttributes();
-				if (nnm.getNamedItem("type") != null) {
-					String type = nnm.getNamedItem("type").getTextContent();
-					String output = outputNode.getTextContent();
-					if(type.equals(CommandType.COMMAND.toString()))
-						commands.add(output);
-					
-					//if(type.equals(CommandType.MESSAGE.toString())) //TODO, display messages. 
-						//repl.displayMessage(output);
+			for (int i = 0; i < historyList.getLength(); i++) {
+				Node node = historyList.item(i);
+
+				if(node.getNodeName().equals(CommandType.COMMAND.toString())) {
+					Command command = new Command(node.getTextContent(), CommandType.COMMAND);
+					commands.add(command);
+				}
+				else if(node.getNodeName().equals(CommandType.REPL_COMMAND.toString())) {
+					Command command = new Command(node.getTextContent(), CommandType.REPL_COMMAND);
+					commands.add(command);
 				}
 			}
-			repl.executeCommands(commands);
+			repl.executeCommandsPlusREPLCommands(commands);
 		}
 		catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block

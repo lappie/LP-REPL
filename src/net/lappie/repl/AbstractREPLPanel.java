@@ -46,12 +46,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 	public static final Color SELECT_BG_COLOR = new Color(0xf0f0f0);
 	public static final Color NEGATIVE_BG_COLOR = new Color(255, 143, 143);
 
-	/**
-	 * Internal we hold the following terms: - command: The command as it is
-	 * typed by the user or will be executed - result: The result of a command -
-	 * commandMode: The mode we're working with. e.g. normal, search,
-	 * historysearch
-	 */
+	//////////////////////////////////////////////////////////////////////////
 
 	private JTextPane area;
 	private Document document;
@@ -217,11 +212,21 @@ public abstract class AbstractREPLPanel extends JPanel {
 		add(commandMode, styles.getRegular());
 		commandIndex = document.getLength();
 	}
+	
+	protected void clearLine() {
+		if(getAllText().length() <= 0) //nothing here yet
+			return;
+		
+		if(getText(document.getLength()-1, 1).equals("\n")) //empty line
+			return;
+		
+		commandIndex = commandIndex-commandMode.length();
+		remove(commandIndex, document.getLength() - commandIndex);
+	}
 
 	protected void removeCommandMarker() {
 		int commandLength = commandMode.length();
 		commandIndex = document.getLength() - commandLength;
-		// TODO check if there really is a command marker in place
 		remove(document.getLength() - commandLength, commandLength);
 	}
 
@@ -264,7 +269,9 @@ public abstract class AbstractREPLPanel extends JPanel {
 	
 	protected void addOutput(String output) {
 		output = output.replaceAll("\n", "\n" + OUT_SYMBOL);//TODO, find better solution
-		add(OUT_SYMBOL + output, styles.getRegular());
+		if(onBlankLine())
+			output = OUT_SYMBOL + output;
+		add(output, styles.getOutput());
 	}
 	
 	protected void addError(String error) {
@@ -272,7 +279,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 	}
 	
 	protected void addResult(String result) {
-		add(RESULT_SYMBOL + result, styles.getOutput());
+		add(RESULT_SYMBOL + result, styles.getRegular());
 	}
 	
 	//////// REPL COMMANDS ///////
@@ -282,7 +289,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 	}
 	
 	protected void addREPLCommand(String command) {
-		add(REPL_COMMAND_SYMBOL + command + "\n", styles.getRegular());
+		add(REPL_COMMAND_SYMBOL + command + "\n", styles.getInfo());
 	}
 
 	protected void addREPLWarning(String warning) {

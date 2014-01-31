@@ -35,6 +35,7 @@ import net.lappie.repl.GenericFileFilter;
 import net.lappie.repl.Settings;
 import net.lappie.repl.StandAloneREPL;
 import net.lappie.repl.Util;
+import net.lappie.repl.functionallity.extensions.ImportREPLCommand;
 import net.lappie.repl.languages.AbstractResult;
 import net.lappie.repl.languages.IEvaluator;
 import net.lappie.repl.languages.ILanguageSettings;
@@ -92,6 +93,8 @@ public class ImportHandler {
 		
 		watchFiles = new WatchFile(reloadButton, reloadRedIcon, imported);
 		(new Thread(watchFiles)).start();
+		
+		replPanel.addREPLCommandListener(new ImportREPLCommand(this));
 	}
 	
 	public JButton getReloadButton() {
@@ -114,6 +117,11 @@ public class ImportHandler {
 		for(String newImport : imported) {
 			doImport(newImport);
 		}
+		reloadButton.setIcon(reloadBlackIcon);
+	}
+	
+	public void clear() {
+		imported.clear();
 		reloadButton.setIcon(reloadBlackIcon);
 	}
 	
@@ -210,10 +218,10 @@ public class ImportHandler {
 		watchFiles.registerFile(file);
 
 		if(!result.hasError())
-			replPanel.displayMessage("Import: " + file);
+			replPanel.displayREPLCommand("Import: " + file);
 		else {
 			replPanel.displayError(result.getError());
-			replPanel.displayError("Import failed: " + file);
+			replPanel.displayREPLError("Import failed: " + file);
 		}
 		
 		return;
@@ -280,6 +288,18 @@ public class ImportHandler {
 			container.invalidate();
 			container.repaint();
 		}
+	}
+	
+	/**
+	 * Import a file directly to the REPL
+	 * @param file
+	 */
+	public void executeImport(String file) {
+		if(imported.contains(file)) //don't add the same file twice
+			return; 
+		
+		addedImports.add(file);
+		execute();
 	}
 	
 	private class AddImportAction extends AbstractAction {

@@ -21,7 +21,6 @@ import net.lappie.repl.functionallity.SyntaxHighlightParser;
 import net.lappie.repl.functionallity.WordSelectionListener;
 import net.lappie.repl.functionallity.extensions.IREPLExtension;
 import net.lappie.repl.functionallity.extensions.SearchExtension;
-import net.lappie.repl.history.Command;
 import net.lappie.repl.languages.ILanguageSettings;
 import net.lappie.repl.languages.rascal.RascalSettings;
 
@@ -66,7 +65,6 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		commandBackgroundPainter = new BackgroundLinePainter(getREPLTextComponent());
 		currentLinePainter = new CurrentLinePainter(getREPLTextComponent(), StyleSettings.CURRENT_LINE_COLOR); // line highlighter
 		
-
 		//Listeners: 
 		SyntaxHighlightParser parser = new SyntaxHighlightParser(getREPLTextComponent(), styles);
 		documentListener = new REPLDocumentListener(this, parser);
@@ -75,7 +73,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 
 		add(statusBar, BorderLayout.SOUTH);
 	}
-	
+
 	@Override
 	protected void addBackgroundCommandMarker() {
 		commandBackgroundPainter.addLineOffset(getCommandIndex(), getTotalLength());
@@ -230,13 +228,19 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 			System.out.println("ESC pressed");
 			if(currentExecution!= null && !currentExecution.isDone()) { //stop any current running evaluation.
 				System.out.println("Stopping running thread");
-				currentExecution.cancel(true);
-				currentExecution.done();
+				if(currentExecution.cancel(true)) {
+					currentExecution.done();
+					addNewLine();
+					addCommandMarker();
+					displayREPLError("Operation cancelled");
+					setCursorToEnd();
+				}
+				
 				System.out.println("Stopped");
 				return;
 			}
 			//reset necessary history settings
-			historyIndex = history.size(); //reset counter
+			historyIndex = commandHistory.size(); //reset counter
 			if(hcIndex >= 0) {
 				hcList.clear();
 				hcIndex = -1;
@@ -322,9 +326,9 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 			if(hcIndex < 0) {
 				hcPrefix = command;
 				hcList.clear();
-				for(Command c : history) {
-					if(c.isCommand() && c.getText().startsWith(command))
-						hcList.add(c.getText());
+				for(String c : commandHistory) {
+					if(c.startsWith(command))
+						hcList.add(c);
 				}
 			}
 			

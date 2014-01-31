@@ -2,6 +2,7 @@ package net.lappie.repl;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -11,8 +12,10 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
 import net.lappie.repl.functionallity.REPLDocumentFilter;
+import net.lappie.repl.functionallity.extensions.IREPLCommandListener;
 import net.lappie.repl.history.Command;
 import net.lappie.repl.history.CommandType;
+import net.lappie.repl.history.History;
 import net.lappie.repl.languages.AbstractResult;
 import net.lappie.repl.languages.IEvaluator;
 import net.lappie.repl.languages.ILanguageSettings;
@@ -21,7 +24,8 @@ import net.lappie.repl.languages.ILanguageSettings;
  * This class extends the AbstractREPLPanel and adds the default REPL behavior of evaluating 
  * commands, and only being able to edit everything after the commandMarker;
  * 
- * It handles extra functionallity of maintaining a history
+ * It handles extra functionallity of maintaining a history of the following types:
+ * Command, Output, Result, Error, Message, REPL Command, REPL Warning, REPL Error
  */
 @SuppressWarnings("serial")
 public class BasicREPLPanel extends AbstractREPLPanel {
@@ -33,8 +37,10 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	private REPLOutputStream out = new REPLOutputStream(this);
 	private REPLErrorStream err = new REPLErrorStream(this);
 	
-	protected ArrayList<Command> history = new ArrayList<>();
+	private History history = new History();
 	protected ArrayList<String> commandHistory = new ArrayList<>();
+	
+	private List<IREPLCommandListener> replCommandListeners = new ArrayList<>();
 	
 	/**
 	 * This will hold where we are when scrolling through history. 
@@ -55,8 +61,10 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		// load:
 		addDocumentFilter(documentFilter);
 		addKeyAction("ENTER", new ExecuteCommand());
-		
-		addMessage("Welcome to the LP-REPL v0.0.1");
+	}
+	
+	public void start() {
+		clearLine(); //if command marker already in place
 		addCommandMarker();
 	}
 	
@@ -72,24 +80,51 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		actions.put(keyCombination, action);
 	}
 	
+	/////////////////////////////////////////////////////////////
+	// Use the following functions to add anything to the REPL //
+	/////////////////////////////////////////////////////////////
+	
+	public void displayError(String error) {
+		history.addError(error);
+		clearLine();
+		addError(error);
+		addCommandMarker();
+	}
+	
+	public void displayOutput(String error) {
+		history.addOutput(error);
+		clearLine();
+		addOutput(error);
+		addCommandMarker();
+	}
+	
 	public void displayMessage(String message) {
-		removeCommand();
-		removeCommandMarker();
+		history.addMessage(message);
+		clearLine();
 		addMessage(message);
 		addCommandMarker();
 	}
 	
-	public void displayWarning(String warning) {
-		removeCommand();
-		removeCommandMarker();
+	public void displayREPLCommand(String command) {
+		history.addREPLCommand(command);
+		documentFilter.disableREPLFiltering();
+		clearLine();
+		documentFilter.enableREPLFiltering();
+		addREPLCommand(command);
+		addCommandMarker();
+	}
+	
+	public void displayREPLWarning(String warning) {
+		history.addREPLWarning(warning);
+		clearLine();
 		addREPLWarning(warning);
 		addCommandMarker();
 	}
 	
-	public void displayError(String error) {
-		removeCommand();
-		removeCommandMarker();
-		addError(error);
+	public void displayREPLError(String error) {
+		history.addREPLError(error);
+		clearLine();
+		addREPLError(error);
 		addCommandMarker();
 	}
 	
@@ -98,13 +133,13 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		return evaluator.getName();
 	}
 	
-	public ArrayList<Command> getHistory() {
+	public History getHistory() {
 		return history;
 	}
 	
 	public void evaluate() {
 		String command = getTypedCommand();
-		addBackgroundCommandMarker();
+		//addBackgroundCommandMarker();
 		if(!evaluator.isComplete(command)) {
 			addNewOutputLine();
 			return;
@@ -118,11 +153,11 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	}
 	
 	private void doBeforeExecution(String command) {
-		history.add(new Command(command, CommandType.COMMAND));
+		history.addCommand(command);
 		commandHistory.add(command);
 		historyIndex = commandHistory.size();
 		
-		documentFilter.disableCompletely();
+		//documentFilter.disableCompletely();
 	}
 	
 	private void doAfterExecution() {
@@ -143,8 +178,42 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	}
 	
 	public void executeCommands(ArrayList<String> commands) {
-		CommandExecutor et = new CommandExecutor(commands);
-		et.execute();
+		currentExecution = new CommandExecutor(commands);
+		currentExecution.execute();
+	}
+	
+	private void handleREPLCommand(String command) {
+		for(IREPLCommandListener l : replCommandListeners)
+			if(l.match(command))
+				l.execute(command);
+	}
+	
+	public void addREPLCommandListener(IREPLCommandListener listener) {
+		replCommandListeners.add(listener);
+	}
+	
+	public void executeCommandsPlusREPLCommands(List<Command> commands) {
+		ArrayList<String> toExecute = new ArrayList<>();
+		for(Command c : commands) {
+			if(c.getType() == CommandType.COMMAND)
+				toExecute.add(c.getText());
+			else if (c.getType() == CommandType.REPL_COMMAND) {
+				
+				executeCommands(toExecute);
+				while(!currentExecution.isDone()) { //TODO, This is where the GUI freezes up 
+					try {
+						Thread.sleep(10);
+					}
+					catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				toExecute.clear();
+				handleREPLCommand(c.getText());
+			}
+		}
+		if(toExecute.size() > 0)
+			executeCommands(toExecute);
 	}
 	
 	private class ExecuteCommand extends AbstractAction {
@@ -171,6 +240,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		protected Void doInBackground() throws Exception {
 			for(String command : commands) {
 				setCommand(command);
+				addBackgroundCommandMarker();
 				addNewLine();
 				
 				doBeforeExecution(command);
@@ -180,8 +250,12 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		    		err.write(result.getError());
 		    	else {
 		    		String resultString = result.toString();
-		    		if(!resultString.equals(""))
-		    			out.writeResult(resultString);
+		    		if(!resultString.equals("")) {
+		    			handleOutputJunk();
+		    			
+		    			addResult(resultString);
+		    			history.addResult(resultString);
+		    		}
 		    	}
 				out.myFlush();
 		    	doAfterExecution();
@@ -189,9 +263,17 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 			return null;
 		}
 		
+		private void handleOutputJunk() {
+			//To make things ugly
+			if(onEmptyOutputLine()) //if a new line is written
+				removeCommandMarker();
+			else if (!onBlankLine()) //if output is written
+				addNewLine();
+		}
+		
 		@Override
 		protected void done() {
-			documentFilter.enableCompletely();
+			documentFilter.enableCompletely(); //TODO
 		}
 	}
 	

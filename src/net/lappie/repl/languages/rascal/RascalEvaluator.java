@@ -145,7 +145,7 @@ public class RascalEvaluator implements IEvaluator {
 	
 	@Override
 	public String getLanguageVersion() {
-		return "0.1"; // TODO
+		return "TODO"; // TODO
 	}
 
 	@Override

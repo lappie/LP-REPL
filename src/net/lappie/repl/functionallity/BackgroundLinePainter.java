@@ -22,7 +22,6 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter {
 		catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public void addLineOffset(int offset) {
@@ -51,7 +50,7 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter {
 			System.out.println(ble);
 		}
 	}
-	
+
 	private class OffsetTuple {
 		private int offset = -1;
 		private int end = -1;

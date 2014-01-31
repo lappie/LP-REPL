@@ -82,8 +82,11 @@ public class StandAloneREPL {
 			}
 		});
 		
+		//Start:
+		replPanel.displayMessage("Welcome to the LP-REPL v" + Settings.VERSION);
+		replPanel.start();
+		
 		frame.setJMenuBar(createMenuBar());
-
 		frame.setVisible(true);
 	}
 	
@@ -230,6 +233,7 @@ public class StandAloneREPL {
 		public void actionPerformed(ActionEvent e) {
 			replPanel.clearScreen();
 			replPanel.getEvaluator().clear();
+			importHandler.clear();
 			replPanel.addStatusMessage("Session cleared");
 		}
 	}	
@@ -255,7 +259,10 @@ public class StandAloneREPL {
 			c.setFileFilter(new GenericFileFilter(Settings.SESSION_FILE_EXTENTION, Settings.SESSION_FILE_DESCRIPTION, true));
 			int rVal = c.showSaveDialog(frame);
 			if (rVal == JFileChooser.APPROVE_OPTION) {
-				XMLSessionParser.exportHistory(replPanel, new File(c.getSelectedFile()+Settings.SESSION_FILE_EXTENTION));
+				File f = c.getSelectedFile();
+				if(!c.getSelectedFile().toString().contains("."))
+					f = new File(c.getSelectedFile()+Settings.SESSION_FILE_EXTENTION);
+				XMLSessionParser.exportHistory(replPanel, f);
 				replPanel.addStatusMessage("File succesfully saved");
 			}
 		}
