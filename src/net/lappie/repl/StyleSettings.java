@@ -10,7 +10,8 @@ import javax.swing.text.StyleContext;
 
 public class StyleSettings {
 	
-	public final static Color LINE_COLOR = new Color(202, 227, 251);
+	public final static Color BACKGROUND_COMMAND_COLOR = new Color(238, 245, 255);
+	public final static Color CURRENT_LINE_COLOR = new Color(202, 227, 251);
 	public final static Color LINE_ERROR_COLOR = new Color(255, 180, 180);
 	
 	public final static Color HIGHLIGHT_COLOR = Color.YELLOW;

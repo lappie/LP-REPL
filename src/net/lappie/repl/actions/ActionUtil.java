@@ -4,14 +4,14 @@ public class ActionUtil
 {
 	public static String getHelpText()
 	{
-		return "Welcome to the new REPL for Rascal. You can make a REPL per project by rightclicking on " +
-				"a project file and click 'Start REPL'.\n" +
+		return "Welcome to the LP-REPL. Currently only Rascal is supported, but other\n languages are coming soon.\n" +
 				"\n" +
-				"Some tips:\n" +
+				"Some tips to get you started:\n" +
 				" - History: CTRL + UP, CTRL + DOWN\n" +
-				" - Search results: CTRL + F\n" +
-				" - Save history: CTRL + S\n" +
-				" - Open history: CTRL + O\n" +
+				" - History completion: TAB\n" + 
+				" - Search in the REPL: CTRL + F\n" +
+				" - Save session: CTRL + S\n" +
+				" - Open session: CTRL + O\n" +
 				" - Select some text and press CTRL+ENTER to evaluate it\n" + 
 				"\n" +
 				"Have fun!";

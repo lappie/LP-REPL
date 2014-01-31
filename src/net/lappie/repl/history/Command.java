@@ -22,6 +22,6 @@ public class Command {
 	}
 	
 	public boolean isCommand() {
-		return type.equals(CommandType.COMMAND.toString());
+		return type.equals(CommandType.COMMAND);
 	}
 }

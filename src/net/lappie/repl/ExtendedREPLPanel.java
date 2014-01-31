@@ -2,6 +2,7 @@ package net.lappie.repl;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -12,13 +13,15 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.Highlight;
 
-import net.lappie.repl.functionallity.LinePainter;
+import net.lappie.repl.functionallity.BackgroundLinePainter;
+import net.lappie.repl.functionallity.CurrentLinePainter;
 import net.lappie.repl.functionallity.REPLDocumentListener;
 import net.lappie.repl.functionallity.StatusBar;
 import net.lappie.repl.functionallity.SyntaxHighlightParser;
 import net.lappie.repl.functionallity.WordSelectionListener;
 import net.lappie.repl.functionallity.extensions.IREPLExtension;
 import net.lappie.repl.functionallity.extensions.SearchExtension;
+import net.lappie.repl.history.Command;
 import net.lappie.repl.languages.ILanguageSettings;
 import net.lappie.repl.languages.rascal.RascalSettings;
 
@@ -40,11 +43,17 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private DefaultHighlighter.DefaultHighlightPainter highlightPainter;
 	private DefaultHighlighter.DefaultHighlightPainter backgroundHighlightPainter;
 
-	private LinePainter linePainter;
+	private BackgroundLinePainter commandBackgroundPainter;
+	private CurrentLinePainter currentLinePainter;
 	private IREPLExtension loadedExtention = null;
 
 	private StatusBar statusBar = new StatusBar(AbstractREPLPanel.WIDTH);
 	private ILanguageSettings settings;
+	
+	//history completion: 
+	private int hcIndex = -1;
+	private ArrayList<String> hcList = new ArrayList<>();
+	private String hcPrefix = "";
 
 	public ExtendedREPLPanel(ILanguageSettings settings) {
 		super(settings);
@@ -54,8 +63,10 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		//The painters for background colors: 
 		highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(StyleSettings.HIGHLIGHT_COLOR);
 		backgroundHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(StyleSettings.BACKGROUND_HIGHLIGHT_COLOR);
-		linePainter = new LinePainter(getREPLTextComponent(), StyleSettings.LINE_COLOR); // line highlighter
+		commandBackgroundPainter = new BackgroundLinePainter(getREPLTextComponent());
+		currentLinePainter = new CurrentLinePainter(getREPLTextComponent(), StyleSettings.CURRENT_LINE_COLOR); // line highlighter
 		
+
 		//Listeners: 
 		SyntaxHighlightParser parser = new SyntaxHighlightParser(getREPLTextComponent(), styles);
 		documentListener = new REPLDocumentListener(this, parser);
@@ -65,6 +76,11 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		add(statusBar, BorderLayout.SOUTH);
 	}
 	
+	@Override
+	protected void addBackgroundCommandMarker() {
+		commandBackgroundPainter.addLineOffset(getCommandIndex(), getTotalLength());
+	}
+
 	/**
 	 * ONLY for proof of concept that we can use search in an Eclipse view. 
 	 * This method will be removed. 
@@ -83,7 +99,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 
 	public void removeAllHighlights() {
 		for (Highlight h : getHighlighter().getHighlights()) {
-			if (h.getPainter() != linePainter)
+			if (h.getPainter() != currentLinePainter)
 				getHighlighter().removeHighlight(h);
 		}
 	}
@@ -102,17 +118,17 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	public void removeAllBackgroundHighlights() {
 		for (Highlight h : getHighlighter().getHighlights()) {
 			if(getSelection() == null || (h.getStartOffset() != getSelectionStart() && h.getEndOffset() != getSelectionEnd())) //do not remove current selection 
-				if (h.getPainter() != linePainter && h.getPainter() != highlightPainter)
+				if (h.getPainter() != currentLinePainter && h.getPainter() != highlightPainter)
 					getHighlighter().removeHighlight(h);
 		}
 	}
 
 	public void showErrorStatus() {
-		linePainter.setColor(StyleSettings.LINE_ERROR_COLOR);
+		currentLinePainter.setColor(StyleSettings.LINE_ERROR_COLOR);
 	}
 
 	public void showNormalStatus() {
-		linePainter.setColor(StyleSettings.LINE_COLOR);
+		currentLinePainter.setColor(StyleSettings.CURRENT_LINE_COLOR);
 	}
 
 	public void addStatusMessage(String message) {
@@ -144,6 +160,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		addKeyAction("control ENTER", new ForceExecuteCommand());
 		addKeyAction("control UP", new HistoryUpCommand());
 		addKeyAction("control DOWN", new HistoryDownCommand());
+		addKeyAction("TAB", new HistoryCompletionCommand());
 
 		addKeyAction("HOME", new HomeCommand());
 		addKeyAction("shift HOME", new ShiftHomeCommand());
@@ -218,8 +235,15 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				System.out.println("Stopped");
 				return;
 			}
+			//reset necessary history settings
 			historyIndex = history.size(); //reset counter
-			System.out.println(historyIndex);
+			if(hcIndex >= 0) {
+				hcList.clear();
+				hcIndex = -1;
+				setCommand(hcPrefix);
+				return;
+			}
+			
 			setCommand("");
 			setMode(COMMAND_SYMBOL);
 
@@ -281,6 +305,39 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 			}
 			setCommand(commandHistory.get(historyIndex));
 		}
+	}
+	
+	private class HistoryCompletionCommand extends AbstractAction {
+
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			String command = getCommand();
+			if(command.trim().length() == 0)  { //perform original action
+				ActionMap actions = getREPLActionMap();
+				Action a = actions.get("insert-tab"); // perform original action.
+				a.actionPerformed(ev);
+				return;
+			}
+			
+			if(hcIndex < 0) {
+				hcPrefix = command;
+				hcList.clear();
+				for(Command c : history) {
+					if(c.isCommand() && c.getText().startsWith(command))
+						hcList.add(c.getText());
+				}
+			}
+			
+			hcIndex++;
+			if(hcIndex < hcList.size()) {
+				setCommand(hcList.get(hcIndex));
+			}
+			else {
+				hcIndex = -1; //start from the beginning
+				setCommand(hcPrefix);
+			}
+		}
+		
 	}
 
 	public static void main(String args[]) {

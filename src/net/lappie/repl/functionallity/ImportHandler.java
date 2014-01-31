@@ -1,5 +1,7 @@
 package net.lappie.repl.functionallity;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -7,9 +9,21 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -19,12 +33,12 @@ import javax.swing.JPanel;
 import net.lappie.repl.ExtendedREPLPanel;
 import net.lappie.repl.GenericFileFilter;
 import net.lappie.repl.Settings;
+import net.lappie.repl.StandAloneREPL;
 import net.lappie.repl.Util;
 import net.lappie.repl.languages.AbstractResult;
 import net.lappie.repl.languages.IEvaluator;
 import net.lappie.repl.languages.ILanguageSettings;
 
-//TODO http://docs.oracle.com/javase/tutorial/essential/io/notification.html
 public class ImportHandler {
 	
 	private ExtendedREPLPanel replPanel;
@@ -34,6 +48,15 @@ public class ImportHandler {
 	private final String workspaceIconLoc = Settings.BASE + "workspace16.png";
 	private final String removeIconLoc = Settings.BASE + "remove16.png";
 	private final String importIconLoc = Settings.BASE + "load16.png";
+	private final String reloadBlackIconLoc = Settings.BASE + "reload-imports-green-16.png";
+	private final String reloadRedIconLoc = Settings.BASE + "reload-imports-red-16.png";
+	
+	private Icon reloadBlackIcon;
+	private Icon reloadRedIcon;
+	
+	private JButton reloadButton;
+	
+	private WatchFile watchFiles;
 	
 	private ArrayList<String> imported = new ArrayList<>();
 	private ArrayList<String> removedImports = new ArrayList<>();
@@ -56,6 +79,23 @@ public class ImportHandler {
 		this.replPanel = replPanel;
 		this.settings = settings;
 		this.evaluator = settings.getEvaluator();
+		
+		URL url = StandAloneREPL.class.getResource(reloadBlackIconLoc);
+		reloadBlackIcon = new ImageIcon(url);
+		
+		url = StandAloneREPL.class.getResource(reloadRedIconLoc);
+		reloadRedIcon = new ImageIcon(url);
+		
+		reloadButton = new JButton(reloadBlackIcon);
+		reloadButton.addActionListener(new ReloadAction());
+		reloadButton.setToolTipText("Reload imports");
+		
+		watchFiles = new WatchFile(reloadButton, reloadRedIcon, imported);
+		(new Thread(watchFiles)).start();
+	}
+	
+	public JButton getReloadButton() {
+		return reloadButton;
 	}
 	
 	public void showImportPanel(JFrame parent) {
@@ -72,13 +112,9 @@ public class ImportHandler {
 		replPanel.clearScreen();
 		
 		for(String newImport : imported) {
-			System.out.println(newImport);
 			doImport(newImport);
 		}
-	}
-	
-	public void setReloadButton(JButton reloadImportButton) {
-		this.reloadImportButton = reloadImportButton;
+		reloadButton.setIcon(reloadBlackIcon);
 	}
 	
 	
@@ -171,12 +207,13 @@ public class ImportHandler {
 	
 	private void doImport(String file) {
 		AbstractResult result = evaluator.doImport(file);
+		watchFiles.registerFile(file);
 
 		if(!result.hasError())
-			replPanel.displayMessage("Import completed succesfully");
+			replPanel.displayMessage("Import: " + file);
 		else {
 			replPanel.displayError(result.getError());
-			replPanel.displayError("Import failed");
+			replPanel.displayError("Import failed: " + file);
 		}
 		
 		return;
@@ -313,13 +350,69 @@ public class ImportHandler {
 			close();
 		}
 	}
-	/*
-	public static void main(String args[]) {
-		ImportHandler ih = new ImportHandler(null, new RascalSettings());
-		ih.imported.add("workspace/rascal-repl.standalone2/icons");
-		ih.imported.add("workspace/rascal-repl.standalone2/pietje");
-		ih.imported.add("workspace/rascal-repl.standalone2/jantje");
-		ih.imported.add("workspace/rascal-repl.standalone2/hi");
-		ih.showImportPanel(null);
-	}*/
+	
+	private class ReloadAction extends AbstractAction {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			reload();
+		}
+	}
+
+	private class WatchFile implements Runnable {
+		
+		private WatchService watcher;
+		private JButton button;
+		private Icon icon;
+		private ArrayList<String> imported;
+		
+		public void registerFile(String file) {
+			Path p = Paths.get(file).getParent();
+			try {
+				p.register(watcher, ENTRY_MODIFY);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		 
+		public WatchFile(JButton button, Icon icon, ArrayList<String> imported) {
+			this.button = button;
+			this.icon = icon;
+			this.imported = imported;
+			try {
+				this.watcher = FileSystems.getDefault().newWatchService();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				watcher = null;
+			}
+		}
+
+		@Override
+		public void run() {
+			while(true){
+			    try{
+			         WatchKey watchKey = watcher.poll(1,TimeUnit.SECONDS);
+			         if(watchKey == null)
+			        	 continue;
+			         List<WatchEvent<?>> events = watchKey.pollEvents();
+			         for(WatchEvent<?> event : events){
+			        	 Path watchedPath = (Path) watchKey.watchable();
+			        	 Path absolute = watchedPath.resolve((Path) event.context());
+			        	 
+			        	 if(imported.contains(absolute.toString())) {
+			        		 button.setIcon(icon);
+			        		 button.repaint();
+			        	 }
+			         }
+			         if(!watchKey.reset()){
+			            //...handle situation no longer valid
+			         }
+			     }catch(InterruptedException e){
+			            Thread.currentThread().interrupt();
+			     }
+			}
+		}
+	}
 }

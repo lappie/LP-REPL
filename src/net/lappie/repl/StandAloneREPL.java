@@ -48,7 +48,6 @@ public class StandAloneREPL {
 	
 	private final String clearIconLoc = Settings.BASE + "display16.png";
 	private final String importIconLoc = Settings.BASE + "load16.png";
-	private final String reloadImportIconGreenLoc = Settings.BASE + "reload-imports-green-16.png";
 	private final String rascalIconLoc = Settings.BASE + "rascal48.gif";
 
 	public StandAloneREPL() {
@@ -183,15 +182,9 @@ public class StandAloneREPL {
 			Icon importIcon = new ImageIcon(url);
 			importButton = new JButton(importIcon);
 			importButton.addActionListener(new ImportAction());
-			importButton.setToolTipText("Import file");
+			importButton.setToolTipText("Manage imports");
 			
-			url = StandAloneREPL.class.getResource(reloadImportIconGreenLoc);
-			Icon reloadImportIcon = new ImageIcon(url);
-			reloadImportButton = new JButton(reloadImportIcon);
-			reloadImportButton.addActionListener(new ReloadImportAction());
-			reloadImportButton.setToolTipText("Reload imports - unknown out of sync");
-			reloadImportButton.setEnabled(false);
-			importHandler.setReloadButton(reloadImportButton);
+			reloadImportButton = importHandler.getReloadButton();
 		}
 
 		buttonPanel.add(clearButton, FlowLayout.LEFT);
@@ -208,15 +201,6 @@ public class StandAloneREPL {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			importHandler.showImportPanel(frame);
-		}
-		
-	}
-	
-	private class ReloadImportAction extends AbstractAction {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			importHandler.reload();
 		}
 		
 	}

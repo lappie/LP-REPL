@@ -104,6 +104,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	public void evaluate() {
 		String command = getTypedCommand();
+		addBackgroundCommandMarker();
 		if(!evaluator.isComplete(command)) {
 			addNewOutputLine();
 			return;
@@ -121,8 +122,6 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		commandHistory.add(command);
 		historyIndex = commandHistory.size();
 		
-		//addOutputSymbol();
-		
 		documentFilter.disableCompletely();
 	}
 	
@@ -134,6 +133,9 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		setCursorToEnd();
 	}
 	
+	protected void addBackgroundCommandMarker() {
+		//TODO, make event listener?
+	}
 	
 	public void forceEvaluate(final String command) { 
 		currentExecution = new CommandExecutor(command);
