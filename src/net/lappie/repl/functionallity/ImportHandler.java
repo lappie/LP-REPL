@@ -244,13 +244,17 @@ public class ImportHandler {
 			return;
 		}
 		//Restart required. 
+		if(newWorkspace != null) {
+			Settings.setProperty("workspace", newWorkspace.toString());
+			evaluator.setWorkspace(newWorkspace);
+			newWorkspace = null;
+		}
 		
-		Settings.setProperty("workspace", newWorkspace.toString());
-		evaluator.setWorkspace(newWorkspace);
-		newWorkspace = null;
 		evaluator.clear(); //restart
 		replPanel.clearScreen();
 		
+		imported.removeAll(removedImports);
+		removedImports.clear();
 		imported.addAll(addedImports);
 		addedImports.clear();
 		
@@ -281,7 +285,7 @@ public class ImportHandler {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			imported.remove(address);
+			removedImports.add(address);
 			container.remove(label);
 			container.remove(removeButton);
 			updateOkButtonToRestart();

@@ -50,6 +50,7 @@ public class CurrentLinePainter implements Highlighter.HighlightPainter, CaretLi
 			component.getHighlighter().addHighlight(0, 0, this);
 		}
 		catch (BadLocationException ble) {
+			ble.printStackTrace();
 		}
 	}
 	
@@ -74,7 +75,7 @@ public class CurrentLinePainter implements Highlighter.HighlightPainter, CaretLi
 			if (lastView == null) lastView = r;
 		}
 		catch (BadLocationException ble) {
-			System.out.println(ble);
+			ble.printStackTrace();
 		}
 	}
 	
@@ -100,6 +101,7 @@ public class CurrentLinePainter implements Highlighter.HighlightPainter, CaretLi
 					}
 				}
 				catch (BadLocationException ble) {
+					ble.printStackTrace();
 				}
 			}
 		});

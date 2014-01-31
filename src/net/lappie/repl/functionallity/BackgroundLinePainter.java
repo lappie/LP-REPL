@@ -34,8 +34,10 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter {
 	
 	@Override
 	public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
+		OffsetTuple copy = null;
 		try {
 			for(OffsetTuple ot : offsets) {
+				copy = ot;
 				Rectangle r = c.modelToView(ot.offset);
 				int height = r.height;
 				if(ot.end > 0) {
@@ -46,8 +48,8 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter {
 				g.fillRect(0, r.y, c.getWidth(), height);
 			}
 		}
-		catch (BadLocationException ble) {
-			System.out.println(ble);
+		catch (BadLocationException ble) { //can happen when the line has been removed
+			offsets.remove(copy);
 		}
 	}
 
