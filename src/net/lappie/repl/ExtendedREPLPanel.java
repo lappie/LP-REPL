@@ -97,7 +97,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 
 	public void removeAllHighlights() {
 		for (Highlight h : getHighlighter().getHighlights()) {
-			if (h.getPainter() != currentLinePainter)
+			if (h.getPainter() != currentLinePainter && h.getPainter() != commandBackgroundPainter)
 				getHighlighter().removeHighlight(h);
 		}
 	}
@@ -116,7 +116,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	public void removeAllBackgroundHighlights() {
 		for (Highlight h : getHighlighter().getHighlights()) {
 			if(getSelection() == null || (h.getStartOffset() != getSelectionStart() && h.getEndOffset() != getSelectionEnd())) //do not remove current selection 
-				if (h.getPainter() != currentLinePainter && h.getPainter() != highlightPainter)
+				if (h.getPainter() != currentLinePainter && h.getPainter() != highlightPainter && h.getPainter() != commandBackgroundPainter)
 					getHighlighter().removeHighlight(h);
 		}
 	}
@@ -316,7 +316,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		@Override
 		public void actionPerformed(ActionEvent ev) {
 			String command = getCommand();
-			if(command.trim().length() == 0)  { //perform original action
+			if(command.trim().length() == 0 || command.contains("\n"))  { //perform original action
 				ActionMap actions = getREPLActionMap();
 				Action a = actions.get("insert-tab"); // perform original action.
 				a.actionPerformed(ev);
