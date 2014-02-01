@@ -13,6 +13,8 @@ public class REPLDocumentListener implements DocumentListener {
 	private SyntaxHighlightParser parser;
 	private BasicREPLPanel repl;
 	
+	private boolean enabled = true;
+	
 	public REPLDocumentListener(BasicREPLPanel repl, SyntaxHighlightParser parser) {
 		this.parser = parser;
 		this.repl = repl;
@@ -30,6 +32,14 @@ public class REPLDocumentListener implements DocumentListener {
 		e = null;
 	}
 	
+	public void disable() {
+		enabled = false;
+	}
+	
+	public void enable() {
+		enabled = true;
+	}
+	
 	@Override
 	public void changedUpdate(DocumentEvent arg0) {
 		//parser.parseCommand(repl.getCommandIndex(), repl.getCommand());
@@ -39,6 +49,8 @@ public class REPLDocumentListener implements DocumentListener {
 	
 	@Override
 	public void insertUpdate(DocumentEvent arg0) {
+		if(!enabled)
+			return;
 		
 		parser.parseCommand(repl.getCommandIndex(), repl.getCommand());
 		if(e != null)
@@ -47,6 +59,8 @@ public class REPLDocumentListener implements DocumentListener {
 	
 	@Override
 	public void removeUpdate(DocumentEvent arg0) {
+		if(!enabled)
+			return;
 		parser.parseCommand(repl.getCommandIndex(), repl.getCommand());
 		if(e != null)
 			e.update();

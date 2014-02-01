@@ -10,13 +10,20 @@ import java.util.Properties;
 
 public class Settings {
 	
+	//FILES
 	public static final String BASE = "../../../";
-	
 	public static final String SESSION_FILE_EXTENTION = ".xml";
-	
 	public static final String SESSION_FILE_DESCRIPTION = "XML files";
 	
+	//SYSTEM
 	public static final String VERSION = "0.21";
+	
+	//FEATURES
+	//Output folding:
+	public static int MAX_OUTPUT_CHARS = 150;
+	public static int MAX_OUTPUT_LINES = 5;
+	
+	///////////////////// PROPERTIES ///////////////////////////
 	
 	private static File propertiesFile = new File("repl.properties");
 	private static Properties configFile = new Properties();

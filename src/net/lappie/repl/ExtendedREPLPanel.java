@@ -15,6 +15,7 @@ import javax.swing.text.Highlighter.Highlight;
 
 import net.lappie.repl.functionallity.BackgroundLinePainter;
 import net.lappie.repl.functionallity.CurrentLinePainter;
+import net.lappie.repl.functionallity.FoldedTextRepository;
 import net.lappie.repl.functionallity.REPLDocumentListener;
 import net.lappie.repl.functionallity.StatusBar;
 import net.lappie.repl.functionallity.SyntaxHighlightParser;
@@ -41,11 +42,12 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private REPLDocumentListener documentListener;
 	private DefaultHighlighter.DefaultHighlightPainter highlightPainter;
 	private DefaultHighlighter.DefaultHighlightPainter backgroundHighlightPainter;
-
 	private BackgroundLinePainter commandBackgroundPainter;
 	private CurrentLinePainter currentLinePainter;
+	
 	private IREPLExtension loadedExtention = null;
-
+	private FoldedTextRepository foldedTextRepo = new FoldedTextRepository(this);
+	
 	private StatusBar statusBar = new StatusBar(AbstractREPLPanel.WIDTH);
 	private ILanguageSettings settings;
 	
@@ -63,6 +65,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(StyleSettings.HIGHLIGHT_COLOR);
 		backgroundHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(StyleSettings.BACKGROUND_HIGHLIGHT_COLOR);
 		commandBackgroundPainter = new BackgroundLinePainter(getREPLTextComponent());
+		addOffsetListener(commandBackgroundPainter);
 		currentLinePainter = new CurrentLinePainter(getREPLTextComponent(), StyleSettings.CURRENT_LINE_COLOR); // line highlighter
 		
 		//Listeners: 
@@ -70,8 +73,29 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		documentListener = new REPLDocumentListener(this, parser);
 		addDocumentListener(documentListener);
 		addCaretListener(new WordSelectionListener(this));
-
+		out.addFoldedTextRepo(foldedTextRepo);
+		getREPLTextComponent().addMouseListener(foldedTextRepo);
+		addOffsetListener(foldedTextRepo);
+		
 		add(statusBar, BorderLayout.SOUTH);
+	}
+	
+	@Override
+	public void removeOutput(int offset, int len) {
+		documentFilter.disableREPLFiltering();
+		documentListener.disable();
+		super.removeOutput(offset, len);
+		documentListener.enable();
+		documentFilter.enableREPLFiltering();
+	}
+	
+	@Override
+	public void switchClickableText(int offset, String text) {
+		documentFilter.disableREPLFiltering();
+		documentListener.disable();
+		super.switchClickableText(offset, text);
+		documentListener.enable();
+		documentFilter.enableREPLFiltering();
 	}
 
 	@Override

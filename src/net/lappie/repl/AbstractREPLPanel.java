@@ -3,6 +3,8 @@ package net.lappie.repl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +23,7 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.Highlighter;
 
+import net.lappie.repl.functionallity.IOffsetListener;
 import net.lappie.repl.functionallity.LongWordWrapEditorKit;
 
 @SuppressWarnings("serial")
@@ -40,7 +43,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 	private final String REPL_COMMAND_SYMBOL = ">  "; // The REPL informing of an executed command
 	private final String RESULT_SYMBOL = "-> "; 
 	protected final String COMMAND_SYMBOL = ">> "; //user entering statements
-	private final String OUT_SYMBOL = "   "; //also used for errors
+	private static final String OUT_SYMBOL = "   "; //also used for errors
 
 	public static final Color CURRENT_LINE_BG_COLOR = new Color(200, 215, 255);
 	public static final Color SELECT_BG_COLOR = new Color(0xf0f0f0);
@@ -63,6 +66,78 @@ public abstract class AbstractREPLPanel extends JPanel {
 
 		loadArea();
 		styles = StyleSettings.getInstance(area);
+	}
+	
+	public void addClickableText(String text) {
+		add(text, styles.getOutputFolder());
+	}
+	
+	/**
+	 * Make sure the inserted text is parsed using parseOutput() first! 
+	 */
+	public void insertOutput(int offset, String text) {
+		try {
+			document.insertString(offset, text, styles.getOutput());
+			commandIndex += text.length();
+			callOffsetListeners(offset, text.length());
+		}
+		catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Use this to transform any output so that it is valid for the REPL. 
+	 * @param output
+	 * @return
+	 */
+	public static String parseOutput(String output) {
+		return output.replaceAll("\n", "\n" + OUT_SYMBOL); //TODO ugly, fix this
+	}
+	
+	public void removeOutput(int offset, int len) {
+		try {
+			document.remove(offset, len);
+			commandIndex -= len;
+			callOffsetListeners(offset, -len);
+		}
+		catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Replace some clickable text for some other clickable text. 
+	 * Make sure that they are of the same length! 
+	 * @param offset
+	 * @param text
+	 */
+	public void switchClickableText(int offset, String text) {
+		try {
+			document.remove(offset, text.length());
+			document.insertString(offset, text, styles.getOutputFolder());
+		}
+		catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private List<IOffsetListener> offsetListeners = new ArrayList<>();
+	
+	/**
+	 * In normal cases for a REPL, all text above the commandmarker does not change. However
+	 * there are cases, like code-folding, when this does happen. This might disrupt any
+	 * functionallity for classes that hold an offset. 
+	 * 
+	 * These listeners are called when text is changed above the command marker. 
+	 */
+	public void addOffsetListener(IOffsetListener listener) {
+		offsetListeners.add(listener);
+	}
+	
+	private void callOffsetListeners(int offset, int length) {
+		for(IOffsetListener listener : offsetListeners)
+			listener.fire(offset, length);
 	}
 
 	private void loadArea() {

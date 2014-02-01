@@ -28,6 +28,7 @@ public class StyleSettings {
 	private Style italic;
 	private Style error;
 	private Style warning;
+	private Style outputFolder;
 	
 	private Style stringToken;
 	private Style keywordToken;
@@ -35,7 +36,6 @@ public class StyleSettings {
 	private StyleSettings(JTextPane area) {
 		area.setFont(consoleFont);
 		area.setForeground(Color.BLACK);
-		
 		
 		Style def = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
 		regular = area.addStyle("regular", def );
@@ -65,6 +65,11 @@ public class StyleSettings {
 		keywordToken = area.addStyle("KeywordToken", regular);
 		StyleConstants.setForeground(keywordToken, new Color(123, 0, 82));
 		StyleConstants.setBold(keywordToken, true);
+		
+		outputFolder = area.addStyle("outputFolder", regular);
+		StyleConstants.setItalic(outputFolder, true);
+		StyleConstants.setBold(outputFolder, true);
+		StyleConstants.setForeground(outputFolder, new Color(255, 0, 221));
 	}
 	
 	public static StyleSettings getInstance(JTextPane area) {
@@ -103,5 +108,9 @@ public class StyleSettings {
 	
 	public Style getKeywordToken() {
 		return keywordToken;
+	}
+	
+	public Style getOutputFolder() {
+		return outputFolder;
 	}
 }

@@ -34,7 +34,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	protected REPLDocumentFilter documentFilter = new REPLDocumentFilter(this);
 	
 	protected ILanguageSettings settings;
-	private REPLOutputStream out = new REPLOutputStream(this);
+	protected REPLOutputStream out = new REPLOutputStream(this);
 	private REPLErrorStream err = new REPLErrorStream(this);
 	
 	private History history = new History();
@@ -62,6 +62,8 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		addDocumentFilter(documentFilter);
 		addKeyAction("ENTER", new ExecuteCommand());
 	}
+	
+	
 	
 	public void start() {
 		clearLine(); //if command marker already in place
@@ -245,7 +247,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				
 				doBeforeExecution(command);
 				AbstractResult result = evaluator.execute(command);
-				out.myFlush();
+				out.finish();
 				if(result.hasError())
 		    		err.write(result.getError());
 		    	else {
@@ -257,7 +259,6 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		    			history.addResult(resultString);
 		    		}
 		    	}
-				out.myFlush();
 		    	doAfterExecution();
 			}
 			return null;

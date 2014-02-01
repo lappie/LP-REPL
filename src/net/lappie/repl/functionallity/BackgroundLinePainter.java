@@ -11,7 +11,15 @@ import javax.swing.text.JTextComponent;
 
 import net.lappie.repl.StyleSettings;
 
-public class BackgroundLinePainter implements Highlighter.HighlightPainter {
+/**
+ * Add a background color to the lines beloning to the given offsets. 
+ * 
+ * Because this class works with offsets it is necessary to add this as an OffsetListener to 
+ * the REPL in case some text before the command marker is changed. 
+ * @author Lappie
+ *
+ */
+public class BackgroundLinePainter implements Highlighter.HighlightPainter, IOffsetListener {
 
 	private ArrayList<OffsetTuple> offsets = new ArrayList<>();
 	
@@ -64,6 +72,17 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter {
 		
 		public OffsetTuple(int offset) {
 			this.offset = offset;
+		}
+	}
+
+	@Override
+	public void fire(int offset, int length) {
+		for(OffsetTuple ot : offsets) {
+			if(ot.offset > offset) {
+				ot.offset += length;
+				if(ot.end >= 0)
+					ot.end += length;
+			}
 		}
 	}
 }

@@ -14,6 +14,8 @@ public class ActionUtil
 				" - Open session: CTRL + O\n" +
 				" - Select some text and press CTRL+ENTER to evaluate it\n" + 
 				"\n" +
+				"Use ESC to cancel any running operation.\n" + 
+				"\n" + 
 				"Have fun!";
 	}
 }
