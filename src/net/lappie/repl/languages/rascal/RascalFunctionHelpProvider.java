@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import net.lappie.repl.languages.IFunctionHelpProvider;
 
-public class RascalFunctionHelpProvider implements IFunctionHelpProvider{
+class RascalFunctionHelpProvider implements IFunctionHelpProvider{
 	
 	private final String BASE = "http://tutor.rascal-mpl.org/Rascal/Rascal.html";
 	private HashMap<String, String> functionMap = new HashMap<>();

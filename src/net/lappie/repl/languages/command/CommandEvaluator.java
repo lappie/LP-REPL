@@ -13,13 +13,13 @@ import net.lappie.repl.REPLOutputStream;
 import net.lappie.repl.languages.AbstractResult;
 import net.lappie.repl.languages.BasicEvaluator;
 
-public class CommandEvaluator extends BasicEvaluator {
+class CommandEvaluator extends BasicEvaluator {
 
 	private ProcessBuilder processBuilder;
 	private Process process;
 	private PrintWriter outputWriter;
 	
-	public CommandEvaluator(String command) {
+	CommandEvaluator(String command) {
 		String commands[] = command.split("\\s+"); 
 		try {
 			processBuilder = new ProcessBuilder(commands);

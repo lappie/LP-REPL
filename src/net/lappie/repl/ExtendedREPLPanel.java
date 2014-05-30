@@ -49,7 +49,6 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private FoldedTextRepository foldedTextRepo = new FoldedTextRepository(this);
 	
 	private StatusBar statusBar = new StatusBar(AbstractREPLPanel.WIDTH);
-	private ILanguageSettings settings;
 	
 	//history completion: 
 	private int hcIndex = -1;
@@ -188,7 +187,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		super.evaluate();
 	}
 
-	public void loadKeys() {
+	private void loadKeys() {
 		addKeyAction("shift ENTER", new InsertBreakCommand());
 		addKeyAction("control ENTER", new ForceExecuteCommand());
 		addKeyAction("control UP", new HistoryUpCommand());

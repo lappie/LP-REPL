@@ -176,13 +176,13 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		//TODO, make event listener?
 	}
 	
-	public void forceEvaluate(final String command) { 
+	private void forceEvaluate(final String command) { 
 		currentExecution = new CommandExecutor(command);
 		currentExecution.beforeStart();
 		currentExecution.execute();
 	}
 	
-	public void executeCommands(List<String> commands) {
+	private void executeCommands(List<String> commands) {
 		currentExecution = new CommandExecutor(commands);
 		currentExecution.beforeStart();
 		currentExecution.execute();
@@ -237,16 +237,16 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 
 		private List<String> commands;
 		
-		public CommandExecutor(List<String> commands) {
+		private CommandExecutor(List<String> commands) {
 			this.commands = commands;
 		}
 		
-		public CommandExecutor(String command) {
+		private CommandExecutor(String command) {
 			this.commands = new ArrayList<String>();
 			this.commands.add(command);
 		}
 		
-		public void beforeStart() {
+		private void beforeStart() {
 			documentFilter.disableCompletely();
 		}
 		

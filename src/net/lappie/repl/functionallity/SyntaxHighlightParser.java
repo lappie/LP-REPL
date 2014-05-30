@@ -31,7 +31,7 @@ public class SyntaxHighlightParser {
 		this.styles = styles;
 	}
 	
-	public void parseCommand(int commandOffset, String command) {
+	void parseCommand(int commandOffset, String command) {
 		
 		IActionExecutor<IConstructor> actionExecutor = new NoActionExecutor();
 		if(!command.endsWith(";"))

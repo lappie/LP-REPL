@@ -72,7 +72,7 @@ public class StyleSettings {
 		StyleConstants.setForeground(outputFolder, new Color(255, 0, 221));
 	}
 	
-	public static StyleSettings getInstance(JTextPane area) {
+	static StyleSettings getInstance(JTextPane area) {
 		if(me == null)
 			me = new StyleSettings(area);
 		return me;

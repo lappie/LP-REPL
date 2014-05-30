@@ -25,7 +25,7 @@ public class LongWordWrapEditorKit extends StyledEditorKit {
 	
 	protected static final int TAB_SIZE=36;
 	
-	ViewFactory defaultFactory = new WrapColumnFactory();
+	private ViewFactory defaultFactory = new WrapColumnFactory();
 
 	@Override
 	public ViewFactory getViewFactory() {

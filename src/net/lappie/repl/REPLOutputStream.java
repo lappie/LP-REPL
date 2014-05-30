@@ -29,11 +29,11 @@ public class REPLOutputStream extends IREPLOutputStream {
 	
 	private int printedIndex = 0;
 	
-	public REPLOutputStream(BasicREPLPanel panel) {
+	REPLOutputStream(BasicREPLPanel panel) {
 		this.panel = panel;
 	}
 	
-	public void addFoldedTextRepo(FoldedTextRepository textRepo) {
+	void addFoldedTextRepo(FoldedTextRepository textRepo) {
 		this.textRepo = textRepo;
 	}
 	
@@ -118,7 +118,7 @@ public class REPLOutputStream extends IREPLOutputStream {
 	 * Other than flush() since that workes on a lower level. (And can't be overwritten because
 	 * that would flush on the wrong times)
 	 */
-	public void finish() {
+	void finish() {
 		writeTotal();
 		panel.getHistory().addOutput(stack);
 		stack = "";

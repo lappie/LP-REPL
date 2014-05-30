@@ -1,7 +1,6 @@
 package net.lappie.repl;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +44,6 @@ public abstract class AbstractREPLPanel extends JPanel {
 	protected final String COMMAND_SYMBOL = ">> "; //user entering statements
 	private static final String OUT_SYMBOL = "   "; //also used for errors
 
-	public static final Color CURRENT_LINE_BG_COLOR = new Color(200, 215, 255);
-	public static final Color SELECT_BG_COLOR = new Color(0xf0f0f0);
-	public static final Color NEGATIVE_BG_COLOR = new Color(255, 143, 143);
-
 	//////////////////////////////////////////////////////////////////////////
 
 	private JTextPane area;
@@ -59,7 +54,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 	private final String commandSymbol = ">> ";
 	protected int commandIndex = 0;
 
-	protected String commandMode = commandSymbol; // current mode of command
+	private String commandMode = commandSymbol; // current mode of command
 
 	public AbstractREPLPanel() {
 		super(new BorderLayout());
@@ -68,7 +63,7 @@ public abstract class AbstractREPLPanel extends JPanel {
 		styles = StyleSettings.getInstance(area);
 	}
 	
-	public void addClickableText(String text) {
+	void addClickableText(String text) {
 		add(text, styles.getOutputFolder());
 	}
 	
@@ -405,15 +400,15 @@ public abstract class AbstractREPLPanel extends JPanel {
 	
 	/////////////// Public Area functions /////////////
 	
-	public void addDocumentFilter(DocumentFilter documentFilter) {
+	void addDocumentFilter(DocumentFilter documentFilter) {
 		((AbstractDocument) document).setDocumentFilter(documentFilter);
 	}
 	
-	public void addDocumentListener(DocumentListener listener) {
+	void addDocumentListener(DocumentListener listener) {
 		document.addDocumentListener(listener);
 	}
 	
-	public void addCaretListener(CaretListener listener) {
+	void addCaretListener(CaretListener listener) {
 		area.addCaretListener(listener);
 	}
 	

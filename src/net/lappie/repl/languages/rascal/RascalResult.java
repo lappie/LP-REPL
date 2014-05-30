@@ -5,18 +5,18 @@ import net.lappie.repl.languages.AbstractResult;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.type.Type;
 
-public class RascalResult extends AbstractResult {
+class RascalResult extends AbstractResult {
 
 	private IValue value;
 	private Type type;
 	
-	public RascalResult(IValue value, Type type) {
+	RascalResult(IValue value, Type type) {
 		super(null);
 		this.value = value;
 		this.type = type;
 	}
 	
-	public RascalResult(String error) {
+	RascalResult(String error) {
 		super(error);
 	}
 	

@@ -6,7 +6,7 @@ public class REPLErrorStream extends IREPLOutputStream {
 	private BasicREPLPanel panel;
 	private String stack = "";
 	
-	public REPLErrorStream(BasicREPLPanel panel) {
+	REPLErrorStream(BasicREPLPanel panel) {
 		this.panel = panel;
 	}
 	
@@ -40,17 +40,17 @@ public class REPLErrorStream extends IREPLOutputStream {
 		return !stack.isEmpty();
 	}
 	
-	public boolean hasError() {
+	boolean hasError() {
 		return !stack.isEmpty();
 	}
 	
-	public void finish() {
+	void finish() {
 		panel.getHistory().addError(stack);
 		panel.addError(stack);
 		stack = "";
 	}
 	
-	public void clear() {
+	void clear() {
 		stack = "";
 	}
 }

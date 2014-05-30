@@ -27,7 +27,7 @@ import org.rascalmpl.parser.gtd.exception.ParseError;
 import org.rascalmpl.uri.URIUtil;
 import org.rascalmpl.values.ValueFactoryFactory;
 
-public class RascalEvaluator implements IEvaluator {
+class RascalEvaluator implements IEvaluator {
 	private Evaluator evaluator;
 	private REPLOutputStream out = null;
 	private REPLErrorStream err = null;

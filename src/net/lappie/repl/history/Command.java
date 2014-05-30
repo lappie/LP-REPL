@@ -5,7 +5,7 @@ public class Command {
 	
 	private String text;
 	
-	public Command(String text, CommandType type) {
+	Command(String text, CommandType type) {
 		this.text = text;
 		this.type = type;
 	}

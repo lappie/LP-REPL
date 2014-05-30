@@ -3,7 +3,7 @@ package net.lappie.repl.languages;
 
 public abstract class AbstractResult {
 	
-	protected String error = null;
+	private String error = null;
 	
 	public AbstractResult(String error) {
 		this.error = error;
