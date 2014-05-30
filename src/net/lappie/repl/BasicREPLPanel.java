@@ -143,7 +143,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 		String command = getTypedCommand();
 		//addBackgroundCommandMarker();
 		if(!evaluator.isComplete(command)) {
-			addNewOutputLine();
+			addToCommand(settings.getPostUnfinishedStatement());
 			return;
 		}
 		forceEvaluate(command);
@@ -176,11 +176,13 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	public void forceEvaluate(final String command) { 
 		currentExecution = new CommandExecutor(command);
+		currentExecution.beforeStart();
 		currentExecution.execute();
 	}
 	
-	public void executeCommands(ArrayList<String> commands) {
+	public void executeCommands(List<String> commands) {
 		currentExecution = new CommandExecutor(commands);
+		currentExecution.beforeStart();
 		currentExecution.execute();
 	}
 	
@@ -227,9 +229,9 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	protected class CommandExecutor extends SwingWorker<Void, Void> {
 
-		private ArrayList<String> commands;
+		private List<String> commands;
 		
-		public CommandExecutor(ArrayList<String> commands) {
+		public CommandExecutor(List<String> commands) {
 			this.commands = commands;
 		}
 		
@@ -238,27 +240,51 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 			this.commands.add(command);
 		}
 		
+		public void beforeStart() {
+			documentFilter.disableCompletely();
+		}
+		
 		@Override
-		protected Void doInBackground() throws Exception {
+		protected Void doInBackground() {
 			for(String command : commands) {
 				setCommand(command);
 				addBackgroundCommandMarker();
 				addNewLine();
 				
 				doBeforeExecution(command);
+				err.clear();
 				AbstractResult result = evaluator.execute(command);
+				
+				//If we have an evaluator that returns everything via the streams, wait for it: 
+				if(settings.getEvaluator().waitForOutput()) {
+					while(!out.isReady() && !err.hasError()) {
+						try {
+							Thread.sleep(200);
+						}
+						catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				
 				out.finish();
-				if(result.hasError())
-		    		err.write(result.getError());
-		    	else {
-		    		String resultString = result.toString();
-		    		if(!resultString.equals("")) {
-		    			handleOutputJunk();
-		    			
-		    			addResult(resultString);
-		    			history.addResult(resultString);
-		    		}
-		    	}
+				if(err.hasError())
+					err.finish();
+				
+				if(result != null) {
+					if(result.hasError())
+			    		err.write(result.getError());
+			    	else {
+			    		String resultString = result.toString();
+			    		if(!resultString.equals("")) {
+			    			handleOutputJunk();
+			    			
+			    			addResult(resultString);
+			    			history.addResult(resultString);
+			    		}
+			    	}
+				}
 		    	doAfterExecution();
 			}
 			return null;

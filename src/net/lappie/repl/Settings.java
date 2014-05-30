@@ -22,6 +22,7 @@ public class Settings {
 	//Output folding:
 	public static int MAX_OUTPUT_CHARS = 150;
 	public static int MAX_OUTPUT_LINES = 5;
+	public static int MAX_RESULT_CHARS = 100;
 	
 	///////////////////// PROPERTIES ///////////////////////////
 	

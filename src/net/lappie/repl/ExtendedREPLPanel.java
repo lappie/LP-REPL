@@ -102,6 +102,13 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	protected void addBackgroundCommandMarker() {
 		commandBackgroundPainter.addLineOffset(getCommandIndex(), getTotalLength());
 	}
+	
+	@Override
+	protected void addResult(String result) {
+		if(result.length() > Settings.MAX_RESULT_CHARS)
+			result = result.substring(0, Settings.MAX_RESULT_CHARS);
+		super.addResult(result);
+	}
 
 	/**
 	 * ONLY for proof of concept that we can use search in an Eclipse view. 
@@ -254,6 +261,8 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				System.out.println("Stopping running thread");
 				if(currentExecution.cancel(true)) {
 					currentExecution.done();
+					settings.getEvaluator().terminate();
+					out.finish();
 					addNewLine();
 					addCommandMarker();
 					displayREPLError("Operation cancelled");

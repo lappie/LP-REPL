@@ -21,6 +21,8 @@ public interface IEvaluator
 	 */
 	public AbstractResult execute(String statement); 
 	
+	public void terminate();
+	
 	public AbstractResult doImport(String module);
 	
 	public String getName();
@@ -34,4 +36,11 @@ public interface IEvaluator
 	public void setWorkspace(File workspace);
 	
 	public File getWorkspace();
+	
+	/**
+	 * Some evaluators don't return any output via the execute statement but return it directly (in another thread) to the
+	 * output stream. 
+	 * @return
+	 */
+	public boolean waitForOutput();
 }

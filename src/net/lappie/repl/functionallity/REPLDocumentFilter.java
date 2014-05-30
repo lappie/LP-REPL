@@ -41,8 +41,8 @@ public class REPLDocumentFilter extends DocumentFilter
 	
 	@Override
 	public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-		if(completelyDisabled) //allow no changes
-			return; 
+		//if(completelyDisabled) //allow no changes -- Due to bug in JDocument not necessary
+			//return; 
 		if (enabledREPLFilter) {
 			int uneditableOffset = panel.getUneditableOffset();
 			

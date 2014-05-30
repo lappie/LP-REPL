@@ -29,4 +29,11 @@ public interface ILanguageSettings
 	public boolean hasImport();
 	
 	public boolean hasWorkspace();
+	
+	/**
+	 * Indicates if the output is handled in a different thread. 
+	 * This means that the evaluator will not wait for a result to return. <- TODO
+	 * @return
+	 */
+	//public boolean parallelOutput();
 }

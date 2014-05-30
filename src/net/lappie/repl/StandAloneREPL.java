@@ -32,12 +32,12 @@ import net.lappie.repl.functionallity.ImportHandler;
 import net.lappie.repl.functionallity.extensions.SearchExtension;
 import net.lappie.repl.history.XMLSessionParser;
 import net.lappie.repl.languages.ILanguageSettings;
-import net.lappie.repl.languages.rascal.RascalSettings;
+import net.lappie.repl.languages.command.CommandSettings;
 
 /**
  * Creates a REPL with full functionallity running in a JFrame. 
  * @author Lappie
- *
+ * TODO: http://technical-tejash.blogspot.nl/2010/03/eclipse-avoid-cyclic-dependency-between.html
  */
 public class StandAloneREPL {
 	private JFrame frame;
@@ -52,6 +52,7 @@ public class StandAloneREPL {
 
 	public StandAloneREPL() {
 		frame = new JFrame();
+
 
 		replPanel = createREPLPanel(); //create first, necessary for other functions
 		replPanel.addExtension(new SearchExtension(replPanel));
@@ -151,7 +152,8 @@ public class StandAloneREPL {
 		//settings = new LispSettings();
 		//settings = new PythonSettings();
 		//settings = new CopySettings();
-		settings = new RascalSettings();
+		//settings = new RascalSettings();
+		settings = new CommandSettings();
 		
 		//Loading settings: 
 		String workspaceLoc = Settings.getProperty("workspace");

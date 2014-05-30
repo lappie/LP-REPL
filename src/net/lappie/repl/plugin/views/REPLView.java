@@ -29,7 +29,7 @@ public class REPLView extends ViewPart{
 	// and we want to keep the ability of multiple views, we'll do it like this. 
 	private static ArrayList<ExtendedREPLPanel> repls = new ArrayList<>();
 	
-	public static ExtendedREPLPanel getREPL() { //for making searc happen
+	public static ExtendedREPLPanel getREPL() { //for making search happen
 		if(repls.isEmpty())
 			return null;
 		return repls.get(0);

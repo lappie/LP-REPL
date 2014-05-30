@@ -1,7 +1,6 @@
 package net.lappie.repl;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import net.lappie.repl.functionallity.FoldedTextRepository;
 
@@ -15,7 +14,7 @@ import net.lappie.repl.functionallity.FoldedTextRepository;
  * @author Lappie
  * 
  */
-public class REPLOutputStream extends OutputStream {
+public class REPLOutputStream extends IREPLOutputStream {
 	
 	private BasicREPLPanel panel;
 	private FoldedTextRepository textRepo;
@@ -56,6 +55,7 @@ public class REPLOutputStream extends OutputStream {
 		write(s);
 	}
 	
+	@Override
 	public void write(String output) {
 		if (panel == null)
 			return;
@@ -112,5 +112,10 @@ public class REPLOutputStream extends OutputStream {
 		writeTotal();
 		panel.getHistory().addOutput(stack);
 		stack = "";
+	}
+	
+	@Override
+	public boolean isReady() {
+		return !stack.isEmpty();
 	}
 }

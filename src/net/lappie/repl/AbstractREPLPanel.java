@@ -31,7 +31,7 @@ import net.lappie.repl.functionallity.LongWordWrapEditorKit;
  * This is a JPanel with all basic functions for a REPL. It offers however only these
  * functions and has no behavior in it at all.
  * 
- * Support for wordwrap is supported. Too long words are automatically broken off. 
+ * Support for wordwrap is supported. Too long words are automatically broken off and put on the next line. 
  * 
  * @author Lappenschaar
  */
@@ -123,6 +123,11 @@ public abstract class AbstractREPLPanel extends JPanel {
 	}
 	
 	private List<IOffsetListener> offsetListeners = new ArrayList<>();
+	
+	protected void addToCommand(String add) {
+		add = parseOutput(add);
+		add(add, styles.getRegular());
+	}
 	
 	/**
 	 * In normal cases for a REPL, all text above the commandmarker does not change. However

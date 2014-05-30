@@ -134,6 +134,11 @@ public class RascalEvaluator implements IEvaluator {
 	}
 	
 	@Override
+	public void terminate() {
+		evaluator.endJob(false);
+	}
+	
+	@Override
 	public String getName() {
 		return "Rascal";
 	}
@@ -156,6 +161,11 @@ public class RascalEvaluator implements IEvaluator {
 	@Override
 	public File getWorkspace() {
 		return workspace;
+	}
+
+	@Override
+	public boolean waitForOutput() {
+		return false;
 	}
 	
 }

@@ -1,10 +1,10 @@
 package net.lappie.repl;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
-public class REPLErrorStream extends OutputStream {
+public class REPLErrorStream extends IREPLOutputStream {
 	private BasicREPLPanel panel;
+	private String stack = "";
 	
 	public REPLErrorStream(BasicREPLPanel panel) {
 		this.panel = panel;
@@ -27,8 +27,29 @@ public class REPLErrorStream extends OutputStream {
 		write(s);
 	}
 	
+	@Override
 	public void write(String error) {
-		panel.getHistory().addError(error);
-		panel.addError(error);
+		if(!stack.isEmpty())
+			stack += "\n";
+		stack += error;
+	}
+	
+	@Override
+	public boolean isReady() {
+		return !stack.isEmpty();
+	}
+	
+	public boolean hasError() {
+		return !stack.isEmpty();
+	}
+	
+	public void finish() {
+		panel.getHistory().addError(stack);
+		panel.addError(stack);
+		stack = "";
+	}
+	
+	public void clear() {
+		stack = "";
 	}
 }
