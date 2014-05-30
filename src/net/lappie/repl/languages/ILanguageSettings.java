@@ -6,6 +6,8 @@ public interface ILanguageSettings
 {
 	public IEvaluator getEvaluator();
 	
+	public void load() throws Exception;
+	
 	/**
 	 * Return the output that needs to be done to add to the REPL display when 
 	 * a statement is not yet finished but is executed. 
@@ -35,5 +37,11 @@ public interface ILanguageSettings
 	 * This means that the evaluator will not wait for a result to return. <- TODO
 	 * @return
 	 */
-	//public boolean parallelOutput();
+	public boolean parallelOutput();
+	
+	/**
+	 * Ignore the first output since it is an echo of the input. 
+	 * @return
+	 */
+	public boolean ignoreFirstOutput();
 }

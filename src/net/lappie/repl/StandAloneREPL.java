@@ -7,7 +7,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
@@ -33,6 +36,7 @@ import net.lappie.repl.functionallity.extensions.SearchExtension;
 import net.lappie.repl.history.XMLSessionParser;
 import net.lappie.repl.languages.ILanguageSettings;
 import net.lappie.repl.languages.command.CommandSettings;
+import net.lappie.repl.languages.rascal.RascalSettings;
 
 /**
  * Creates a REPL with full functionallity running in a JFrame. 
@@ -54,7 +58,9 @@ public class StandAloneREPL {
 		frame = new JFrame();
 
 
-		replPanel = createREPLPanel(); //create first, necessary for other functions
+		replPanel = new ExtendedREPLPanel(); //create first, necessary for other functions
+		loadLanguage(new RascalSettings());
+		
 		replPanel.addExtension(new SearchExtension(replPanel));
 		importHandler = new ImportHandler(replPanel, settings);
 
@@ -76,10 +82,10 @@ public class StandAloneREPL {
 		frame.setLocationRelativeTo(null);
 
 		// Make textField get the focus whenever frame is activated.
-		frame.addWindowFocusListener(new WindowAdapter() { //TODO
+		frame.addWindowFocusListener(new WindowAdapter() { 
 			@Override
 			public void windowGainedFocus(WindowEvent e) {
-				replPanel.requestFocusInWindow();
+				replPanel.getREPLTextComponent().requestFocusInWindow();
 			}
 		});
 		
@@ -123,10 +129,20 @@ public class StandAloneREPL {
 		JMenu languages = new JMenu("Languages");
 		languages.setMnemonic(KeyEvent.VK_L);
 		
-		ButtonGroup group = new ButtonGroup();
+		ButtonGroup languageGroup = new ButtonGroup();
+		
+		List<JMenuItem> commandLanguageItems = loadCommandLanguagesMenu();
+		for(JMenuItem languageItem : commandLanguageItems) {
+			languageGroup.add(languageItem);
+			languages.add(languageItem);
+		}
+		if(commandLanguageItems.size() > 0)
+			languages.addSeparator();
+		
+		
 		item = new JRadioButtonMenuItem("Rascal");
 		item.setSelected(true);
-		group.add(item);
+		languageGroup.add(item);
 		
 		languages.add(item);
 		menuBar.add(languages);
@@ -147,22 +163,49 @@ public class StandAloneREPL {
 		
 		return menuBar;
 	}
-
-	private ExtendedREPLPanel createREPLPanel() {
-		//settings = new LispSettings();
-		//settings = new PythonSettings();
-		//settings = new CopySettings();
-		//settings = new RascalSettings();
-		settings = new CommandSettings();
-		
+	
+	private List<JMenuItem> loadCommandLanguagesMenu() {
+    	File dir = new File(""+"commandLanguages");
+    	File files[] = dir.listFiles(new FilenameFilter() { 
+    	         @Override
+				public boolean accept(File dir, String filename)
+    	              { return filename.endsWith(".xml"); }
+    	});
+    	if(files == null) //if directory not found
+    		return new ArrayList<>();
+    	
+    	List<JMenuItem> buttons = new ArrayList<>();
+    	
+    	for(File file : files) {
+	    	JMenuItem item = new JRadioButtonMenuItem(file.getName());
+			item.setSelected(false);
+			item.addActionListener(new LoadLanguageAction(new CommandSettings(file)));
+			buttons.add(item);
+    	}
+    	return buttons;
+	}
+	
+	public void loadLanguage(ILanguageSettings settings) {
+		this.settings = settings;
+		try {
+			settings.load();
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(frame, "Could not load language", "Error", JOptionPane.ERROR_MESSAGE);
+			replPanel.displayError("Failed to load language");
+			e.printStackTrace();
+			return;
+		}
+		replPanel.load(settings);
+	}
+	
+	private void loadSettings() { //TODO
 		//Loading settings: 
 		String workspaceLoc = Settings.getProperty("workspace");
 		if(workspaceLoc != null) {
 			File workspace = new File(Settings.getProperty("workspace"));
 			settings.getEvaluator().setWorkspace(workspace);
-		}
-		
-		return new ExtendedREPLPanel(settings);
+		}	
 	}
 
 	private void loadKeyActions() {
@@ -199,6 +242,23 @@ public class StandAloneREPL {
 		}
 
 		return buttonPanel;
+	}
+	
+	
+	private class LoadLanguageAction extends AbstractAction {
+
+		private ILanguageSettings settings = null;
+		
+		protected LoadLanguageAction(ILanguageSettings settings) {
+			this.settings = settings;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			//importHandler.showImportPanel(frame);
+			loadLanguage(settings);
+		}
+		
 	}
 	
 	private class ImportAction extends AbstractAction {
@@ -280,7 +340,6 @@ public class StandAloneREPL {
 				} catch (ClassNotFoundException | InstantiationException
 						| IllegalAccessException
 						| UnsupportedLookAndFeelException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				new StandAloneREPL();

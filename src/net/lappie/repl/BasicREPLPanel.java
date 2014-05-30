@@ -30,7 +30,6 @@ import net.lappie.repl.languages.ILanguageSettings;
 @SuppressWarnings("serial")
 public class BasicREPLPanel extends AbstractREPLPanel {
 	
-	private IEvaluator evaluator;
 	protected REPLDocumentFilter documentFilter = new REPLDocumentFilter(this);
 	
 	protected ILanguageSettings settings;
@@ -51,27 +50,30 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	protected CommandExecutor currentExecution = null;
 	
 	
-	public BasicREPLPanel(ILanguageSettings settings) {
+	public BasicREPLPanel() {
 		super();
-		
-		this.settings = settings;
-		this.evaluator = settings.getEvaluator();
-		evaluator.load(out, err);
 		
 		// load:
 		addDocumentFilter(documentFilter);
 		addKeyAction("ENTER", new ExecuteCommand());
 	}
 	
+	public void load(ILanguageSettings settings) {
+		this.settings = settings;
+		settings.getEvaluator().load(out, err);
+	}
 	
 	
+	/**
+	 * Use this to start with the command marker
+	 */
 	public void start() {
 		clearLine(); //if command marker already in place
 		addCommandMarker();
 	}
 	
 	public IEvaluator getEvaluator() {
-		return evaluator;
+		return settings.getEvaluator();
 	}
 	
 	public void addKeyAction(String keyCombination, Action action) {
@@ -132,7 +134,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	@Override
 	public String getName() {
-		return evaluator.getName();
+		return settings.getEvaluator().getName();
 	}
 	
 	public History getHistory() {
@@ -142,7 +144,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	public void evaluate() {
 		String command = getTypedCommand();
 		//addBackgroundCommandMarker();
-		if(!evaluator.isComplete(command)) {
+		if(!settings.getEvaluator().isComplete(command)) {
 			addToCommand(settings.getPostUnfinishedStatement());
 			return;
 		}
@@ -220,6 +222,10 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 			executeCommands(toExecute);
 	}
 	
+	public ILanguageSettings getSettings() {
+		return settings;
+	}
+	
 	private class ExecuteCommand extends AbstractAction {
 		@Override
 		public void actionPerformed(ActionEvent ev) {
@@ -253,11 +259,11 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				
 				doBeforeExecution(command);
 				err.clear();
-				AbstractResult result = evaluator.execute(command);
+				AbstractResult result = settings.getEvaluator().execute(command);
 				
 				//If we have an evaluator that returns everything via the streams, wait for it: 
 				if(settings.getEvaluator().waitForOutput()) {
-					while(!out.isReady() && !err.hasError()) {
+					while(!out.isReady() && !err.isReady()) {
 						try {
 							Thread.sleep(200);
 						}

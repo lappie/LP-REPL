@@ -19,10 +19,12 @@ import org.rascalmpl.library.experiments.resource.resources.file.File;
  */
 public class REPLRascalTest {
 	
-	private ExtendedREPLPanel repl = new ExtendedREPLPanel(new RascalSettings());
+	private ExtendedREPLPanel repl = new ExtendedREPLPanel();
+	
 	private Robot robot;
 	
 	public REPLRascalTest() {
+		repl.load(new RascalSettings());
 		try {
 			robot = new Robot();
 		}

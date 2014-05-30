@@ -29,6 +29,7 @@ public class REPLErrorStream extends IREPLOutputStream {
 	
 	@Override
 	public void write(String error) {
+		System.out.println("Err: " + error);
 		if(!stack.isEmpty())
 			stack += "\n";
 		stack += error;

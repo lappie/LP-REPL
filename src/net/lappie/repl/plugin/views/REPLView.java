@@ -47,7 +47,8 @@ public class REPLView extends ViewPart{
 //			project = ResourcesPlugin.getWorkspace().getRoot().getProject(getViewSite().getSecondaryId());
 		
 		ILanguageSettings settings = new RascalSettings();
-		replPanel = new ExtendedREPLPanel(settings);
+		replPanel = new ExtendedREPLPanel();
+		replPanel.load(settings);
 		repls.add(replPanel);
 		
 		

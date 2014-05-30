@@ -1,0 +1,6 @@
+<language>
+	<name>Python</name>
+	<command>python -i</command>
+	<syntax>python-syntax.rsc</syntax>
+	<syntaxCategories>python-syntax-categories.xml</syntaxCategories>
+</language>

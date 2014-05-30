@@ -1,7 +1,6 @@
 package net.lappie.repl.languages.command;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,10 +19,10 @@ public class CommandEvaluator extends BasicEvaluator {
 	private Process process;
 	private PrintWriter outputWriter;
 	
-	public CommandEvaluator(File file) {
-		//C:/Ruby193/bin/irb.bat
+	public CommandEvaluator(String command) {
+		String commands[] = command.split("\\s+"); 
 		try {
-			processBuilder = new ProcessBuilder("python", "-i");
+			processBuilder = new ProcessBuilder(commands);
 			process = processBuilder.start();
 		}
 		catch (IOException e) {

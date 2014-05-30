@@ -27,6 +27,8 @@ public class REPLOutputStream extends IREPLOutputStream {
 	public static final String FOLD_SYMBOL = " <<";
 	public static final String UNFOLD_SYMBOL = "...";
 	
+	private int printedIndex = 0;
+	
 	public REPLOutputStream(BasicREPLPanel panel) {
 		this.panel = panel;
 	}
@@ -57,9 +59,17 @@ public class REPLOutputStream extends IREPLOutputStream {
 	
 	@Override
 	public void write(String output) {
+		System.out.println("Out: " + output);
 		if (panel == null)
 			return;
-		
+		if(output.equals(""))
+			return;
+		printedIndex++;
+		if(panel.getSettings().ignoreFirstOutput())
+			if(printedIndex == 1)
+				return;
+		if(stack != "")
+			stack += "\n";
 		stack += output;
 	}
 	
@@ -112,6 +122,7 @@ public class REPLOutputStream extends IREPLOutputStream {
 		writeTotal();
 		panel.getHistory().addOutput(stack);
 		stack = "";
+		printedIndex = 0;
 	}
 	
 	@Override

@@ -56,9 +56,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private ArrayList<String> hcList = new ArrayList<>();
 	private String hcPrefix = "";
 
-	public ExtendedREPLPanel(ILanguageSettings settings) {
-		super(settings);
-		this.settings = settings;
+	public ExtendedREPLPanel() {
 		loadKeys();
 
 		//The painters for background colors: 
@@ -78,6 +76,12 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		addOffsetListener(foldedTextRepo);
 		
 		add(statusBar, BorderLayout.SOUTH);
+	}
+	
+	@Override
+	public void load(ILanguageSettings settings) {
+		super.load(settings);
+		clearScreen();
 	}
 	
 	@Override
@@ -195,8 +199,7 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 		addKeyAction("shift HOME", new ShiftHomeCommand());
 		addKeyAction("ESCAPE", new EscapeCommand());
 		
-		if(settings.hasFunctionHelpCommand())
-			addKeyAction("F2", new FunctionHelpCommand());
+		addKeyAction("F2", new FunctionHelpCommand());
 	}
 
 	private class KeyExtensionLoader extends AbstractAction {
@@ -217,6 +220,9 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 	private class FunctionHelpCommand extends AbstractAction {
 		@Override
 		public void actionPerformed(ActionEvent ev) {
+			if(!settings.hasFunctionHelpCommand())
+				return;
+			
 			String functionName = getWordUnderCursor();
 			if(functionName.length() > 0)
 				settings.getFunctionHelpProvider().performFunctionHelp(functionName);
@@ -385,8 +391,8 @@ public class ExtendedREPLPanel extends BasicREPLPanel {
 				JFrame frame = new JFrame();
 				frame.setVisible(true);
 
-				ExtendedREPLPanel x = new ExtendedREPLPanel(
-						new RascalSettings());
+				ExtendedREPLPanel x = new ExtendedREPLPanel();
+				x.load(new RascalSettings());
 				x.addExtension(new SearchExtension(x));
 
 				frame.setContentPane(x);

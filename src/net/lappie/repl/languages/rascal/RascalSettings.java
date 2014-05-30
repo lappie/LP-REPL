@@ -13,6 +13,11 @@ public class RascalSettings implements ILanguageSettings {
 	public IEvaluator getEvaluator() {
 		return evaluator;
 	}
+	
+	@Override
+	public void load() {
+		
+	}
 
 	@Override
 	public boolean hasFunctionHelpCommand() {
@@ -49,4 +54,13 @@ public class RascalSettings implements ILanguageSettings {
 		return true;
 	}
 
+	@Override
+	public boolean parallelOutput() {
+		return false;
+	}
+	
+	@Override
+	public boolean ignoreFirstOutput() {
+		return false;
+	}
 }
