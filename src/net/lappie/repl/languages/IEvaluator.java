@@ -21,7 +21,11 @@ public interface IEvaluator
 	 */
 	public AbstractResult execute(String statement); 
 	
-	public void terminate();
+	/**
+	 * Terminate the currently running evaluation. 
+	 * @return true if succesfully terminated, false if failed or unimplemented
+	 */
+	public boolean terminate();
 	
 	public AbstractResult doImport(String module);
 	
@@ -43,4 +47,6 @@ public interface IEvaluator
 	 * @return
 	 */
 	public boolean waitForOutput();
+	
+	public void close();
 }

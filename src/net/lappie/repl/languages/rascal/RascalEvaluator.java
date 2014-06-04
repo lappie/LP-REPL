@@ -134,8 +134,9 @@ class RascalEvaluator implements IEvaluator {
 	}
 	
 	@Override
-	public void terminate() {
+	public boolean terminate() {
 		evaluator.endJob(false);
+		return true;
 	}
 	
 	@Override
@@ -166,6 +167,11 @@ class RascalEvaluator implements IEvaluator {
 	@Override
 	public boolean waitForOutput() {
 		return false;
+	}
+	
+	@Override
+	public void close() {
+		
 	}
 	
 }

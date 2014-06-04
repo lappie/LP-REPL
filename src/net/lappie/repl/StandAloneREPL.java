@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
@@ -36,6 +37,8 @@ import net.lappie.repl.functionallity.extensions.SearchExtension;
 import net.lappie.repl.history.XMLSessionParser;
 import net.lappie.repl.languages.ILanguageSettings;
 import net.lappie.repl.languages.command.CommandSettings;
+import net.lappie.repl.languages.jatha.JathaSettings;
+import net.lappie.repl.languages.jython.JythonSettings;
 import net.lappie.repl.languages.rascal.RascalSettings;
 
 /**
@@ -56,8 +59,12 @@ public class StandAloneREPL {
 
 	public StandAloneREPL() {
 		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new CloseREPLListener());
+		frame.setLocationRelativeTo(null);
 
 
+		//////// Initiate the REPL Panel ///////
 		replPanel = new ExtendedREPLPanel(); //create first, necessary for other functions
 		loadLanguage(new RascalSettings());
 		
@@ -73,14 +80,9 @@ public class StandAloneREPL {
 
 		frame.setContentPane(mainPanel);
 
-		frame.setTitle("LP-REPL"
-				+ (replPanel.getName().length() > 0 ? ": "
-						+ replPanel.getName() : ""));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		loadTitle();
 		frame.pack();
 		
-		frame.setLocationRelativeTo(null);
-
 		// Make textField get the focus whenever frame is activated.
 		frame.addWindowFocusListener(new WindowAdapter() { 
 			@Override
@@ -141,8 +143,20 @@ public class StandAloneREPL {
 		
 		
 		item = new JRadioButtonMenuItem("Rascal");
+		item.addActionListener(new LoadLanguageAction(new RascalSettings()));
 		item.setSelected(true);
 		languageGroup.add(item);
+		languages.add(item);
+		
+		item = new JRadioButtonMenuItem("Jython");
+		item.addActionListener(new LoadLanguageAction(new JythonSettings()));
+		languageGroup.add(item);
+		languages.add(item);
+		
+		item = new JRadioButtonMenuItem("Jatha");
+		item.addActionListener(new LoadLanguageAction(new JathaSettings()));
+		languageGroup.add(item);
+		languages.add(item);
 		
 		languages.add(item);
 		menuBar.add(languages);
@@ -197,6 +211,8 @@ public class StandAloneREPL {
 			return;
 		}
 		replPanel.load(settings);
+		replPanel.start();
+		loadTitle();
 	}
 	
 	private void loadSettings() { //TODO
@@ -206,6 +222,12 @@ public class StandAloneREPL {
 			File workspace = new File(Settings.getProperty("workspace"));
 			settings.getEvaluator().setWorkspace(workspace);
 		}	
+	}
+	
+	private void loadTitle() {
+		frame.setTitle("LP-REPL"
+				+ (settings.getLanguageName().length() > 0 ? ": "
+						+ settings.getLanguageName() : ""));	
 	}
 
 	private void loadKeyActions() {
@@ -255,7 +277,6 @@ public class StandAloneREPL {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//importHandler.showImportPanel(frame);
 			loadLanguage(settings);
 		}
 		
@@ -328,6 +349,40 @@ public class StandAloneREPL {
 				replPanel.addStatusMessage("File succesfully saved");
 			}
 		}
+	}
+	
+	private class CloseREPLListener implements WindowListener {
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+			replPanel.close();
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			replPanel.close();
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+		}
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
+		}
+		
 	}
 
 	public static void main(String[] args) {

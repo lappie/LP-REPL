@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
@@ -21,7 +23,7 @@ import net.lappie.repl.StyleSettings;
  */
 public class BackgroundLinePainter implements Highlighter.HighlightPainter, IOffsetListener {
 
-	private ArrayList<OffsetTuple> offsets = new ArrayList<>();
+	private List<Object> offsets = Collections.synchronizedList(new ArrayList<>());
 	
 	public BackgroundLinePainter(JTextComponent component) {
 		try {
@@ -44,7 +46,8 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter, IOff
 	public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
 		OffsetTuple copy = null;
 		try {
-			for(OffsetTuple ot : offsets) {
+			for(Object otObj : offsets) {
+				OffsetTuple ot = (OffsetTuple) otObj;
 				copy = ot;
 				Rectangle r = c.modelToView(ot.offset);
 				int height = r.height;
@@ -77,7 +80,8 @@ public class BackgroundLinePainter implements Highlighter.HighlightPainter, IOff
 
 	@Override
 	public void fire(int offset, int length) {
-		for(OffsetTuple ot : offsets) {
+		for(Object otObj : offsets) {
+			OffsetTuple ot = (OffsetTuple) otObj;
 			if(ot.offset > offset) {
 				ot.offset += length;
 				if(ot.end >= 0)

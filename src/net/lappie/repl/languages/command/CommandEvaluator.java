@@ -19,16 +19,11 @@ class CommandEvaluator extends BasicEvaluator {
 	private Process process;
 	private PrintWriter outputWriter;
 	
-	CommandEvaluator(String command) {
-		String commands[] = command.split("\\s+"); 
-		try {
-			processBuilder = new ProcessBuilder(commands);
-			process = processBuilder.start();
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	CommandEvaluator(String command) throws IOException {
+		//String commands[] = command.split("\\s+"); 
+		
+		processBuilder = new ProcessBuilder(command);
+		process = processBuilder.start();
 		OutputStream outStream = process.getOutputStream();
 		outputWriter = new PrintWriter(outStream);
 	}
@@ -68,15 +63,12 @@ class CommandEvaluator extends BasicEvaluator {
 	
 	private static class StreamGobbler extends Thread
 	{
-		private InputStream is;
-		
 		private BufferedReader br;
 		
 		private IREPLOutputStream out;
 		
 		StreamGobbler(InputStream is, IREPLOutputStream out)
 		{
-			this.is = is;
 			this.out = out;
 			
 			InputStreamReader isr = new InputStreamReader(is);
@@ -103,5 +95,12 @@ class CommandEvaluator extends BasicEvaluator {
 	@Override
 	public boolean waitForOutput() {
 		return true;
+	}
+	
+	@Override
+	public void close() {
+		System.out.println("Closing..");
+		if(process != null)
+			process.destroy();	
 	}
 }

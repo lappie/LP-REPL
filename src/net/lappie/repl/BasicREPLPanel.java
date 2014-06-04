@@ -65,11 +65,21 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 	
 	
 	/**
-	 * Use this to start with the command marker
+	 * Use this to start with the command marker and clear any created output or errors. 
 	 */
 	public void start() {
+		
 		clearLine(); //if command marker already in place
+		
+		out.finish();
+		if(err.hasError())
+			err.finish();
+		
 		addCommandMarker();
+	}
+	
+	public void close() {
+		settings.getEvaluator().close();
 	}
 	
 	public IEvaluator getEvaluator() {
@@ -206,7 +216,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 			else if (c.getType() == CommandType.REPL_COMMAND) {
 				
 				executeCommands(toExecute);
-				while(!currentExecution.isDone()) { //TODO, This is where the GUI freezes up 
+				while(!currentExecution.isDone()) { //TODO, This is where the REPL hangs when there is no output returned
 					try {
 						Thread.sleep(10);
 					}
@@ -262,7 +272,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 				AbstractResult result = settings.getEvaluator().execute(command);
 				
 				//If we have an evaluator that returns everything via the streams, wait for it: 
-				if(settings.getEvaluator().waitForOutput()) {
+				/*if(settings.getEvaluator().waitForOutput()) {
 					while(!out.isReady() && !err.isReady()) {
 						try {
 							Thread.sleep(200);
@@ -272,7 +282,7 @@ public class BasicREPLPanel extends AbstractREPLPanel {
 							e.printStackTrace();
 						}
 					}
-				}
+				}*/
 				
 				out.finish();
 				if(err.hasError())

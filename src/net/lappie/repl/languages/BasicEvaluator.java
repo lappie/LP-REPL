@@ -20,8 +20,8 @@ public abstract class BasicEvaluator implements IEvaluator {
 	}
 	
 	@Override
-	public void terminate() {
-		
+	public boolean terminate() {
+		return false;
 	}
 
 	@Override
