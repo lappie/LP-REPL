@@ -63,7 +63,6 @@ public class StandAloneREPL {
 		frame.addWindowListener(new CloseREPLListener());
 		frame.setLocationRelativeTo(null);
 
-
 		//////// Initiate the REPL Panel ///////
 		replPanel = new ExtendedREPLPanel(); //create first, necessary for other functions
 		loadLanguage(new RascalSettings());

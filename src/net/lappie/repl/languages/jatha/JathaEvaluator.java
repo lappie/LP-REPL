@@ -1,6 +1,9 @@
 package net.lappie.repl.languages.jatha;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import net.lappie.repl.REPLErrorStream;
 import net.lappie.repl.REPLOutputStream;
@@ -37,9 +40,16 @@ public class JathaEvaluator implements IEvaluator {
 	public AbstractResult execute(String statement) {
 		try
 		{
+			DummyOutputStream dummyErr = new DummyOutputStream();
+			PrintStream orgErr = System.err;
+			System.setErr(new PrintStream(dummyErr));
 			LispValue result = lisp.eval(statement);
-			//lisp.getSymbolTable().
-			out.write(result.toString());
+			System.setErr(orgErr);
+			
+			if(!dummyErr.didPrint())
+				out.write(result.toString());
+			else
+				err.write(result.toString());
 		}
 		catch (Exception e)
 		{
@@ -97,6 +107,21 @@ public class JathaEvaluator implements IEvaluator {
 	@Override
 	public void close() {
 		lisp.exit();
+	}
+	
+	private class DummyOutputStream extends OutputStream
+	{
+		private boolean printed = false;
+		
+		@Override
+		public void write(int b) throws IOException
+		{
+			printed = true;
+		}
+		
+		public boolean didPrint() {
+			return printed;
+		}
 	}
 	
 }

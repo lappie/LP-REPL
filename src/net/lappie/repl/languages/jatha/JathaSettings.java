@@ -40,7 +40,7 @@ public class JathaSettings implements ILanguageSettings {
 	
 	@Override
 	public String getLanguageName() {
-		return "Lisp";
+		return "Lisp (Jatha)";
 	}
 	
 	@Override
